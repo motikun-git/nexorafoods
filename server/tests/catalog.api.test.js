@@ -157,6 +157,14 @@ describe("Catalog API", () => {
     assert.equal((await get("/products/nope")).status, 404);
   });
 
+  it("GET /settings returns the store settings with defaults", async () => {
+    const { status, body } = await get("/settings");
+    assert.equal(status, 200);
+    assert.equal(typeof body.data.storeName, "string");
+    assert.match(body.data.colors.primary, /^#[0-9a-f]{6}$/i);
+    assert.ok(Array.isArray(body.data.hero.slides));
+  });
+
   it("GET /home returns featured and popular without duplicates", async () => {
     await seedCatalog();
     const { body } = await get("/home");

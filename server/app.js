@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const env = require("./config/env");
 const healthRoutes = require("./routes/health.routes");
 const catalogRoutes = require("./routes/catalog.routes");
+const settingsRoutes = require("./routes/settings.routes");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
 
 const app = express();
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/health", healthRoutes);
+app.use("/api/settings", settingsRoutes);
 app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
 // Coming next: /api/auth, /api/cart, /api/orders, /api/admin/...
 
