@@ -15,7 +15,7 @@ const categoryService = require("./category.service");
 
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 48;
-const HOME_LIMIT = 10;
+const HOME_FEATURED_LIMIT = 9; // + a "See more" card on the homepage
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const SORTS = {
@@ -209,15 +209,22 @@ async function getPublicProductBySlug(slug) {
 }
 
 // GET /api/home
-// featured = the store's best sellers (highest soldCount, in stock first),
-//            so the homepage always shows what customers actually buy.
+// featured = products the admin marked as featured (isFeatured), in stock,
+//            best sellers first. If the admin has not featured anything
+//            yet, the best sellers are shown so the homepage is never empty.
 async function getHomeProducts() {
   const categoryIds = await categoryService.getVisibleCategoryIds();
-  const { items: featured } = await runList(
-    { isPublished: true, category: { $in: categoryIds }, soldCount: { $gt: 0 }, stock: { $gt: 0 } },
-    { sort: SORTS.popular, limit: HOME_LIMIT }
+  const base = { isPublished: true, category: { $in: categoryIds }, stock: { $gt: 0 } };
+  const sort = { soldCount: -1, createdAt: -1, _id: 1 };
+
+  const { items: featured } = await runList({ ...base, isFeatured: true }, { sort, limit: HOME_FEATURED_LIMIT });
+  if (featured.length) return { featured, featuredSource: "admin" };
+
+  const { items: bestSellers } = await runList(
+    { ...base, soldCount: { $gt: 0 } },
+    { sort, limit: HOME_FEATURED_LIMIT }
   );
-  return { featured };
+  return { featured: bestSellers, featuredSource: "bestsellers" };
 }
 
 module.exports = { listPublicProducts, getPublicProductBySlug, getHomeProducts, SORTS };

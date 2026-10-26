@@ -1,10 +1,18 @@
 import { Link } from 'react-router'
+import CategoryStrip from '../components/home/CategoryStrip.jsx'
 import HeroSlider from '../components/home/HeroSlider.jsx'
 import SectionHeading from '../components/home/SectionHeading.jsx'
+import SeeMoreCard from '../components/home/SeeMoreCard.jsx'
+import ProductCard from '../components/products/ProductCard.jsx'
 import ProductGrid from '../components/products/ProductGrid.jsx'
+import AutoCarousel from '../components/ui/AutoCarousel.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import { useSettings } from '../context/SettingsContext.jsx'
 import { useApi } from '../hooks/useApi.js'
+
+const SEE_MORE = { _id: 'see-more', seeMore: true }
+// Phone: 2 cards visible, tablet: 3-4, desktop: 5.
+const PRODUCT_SLIDE = 'w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-2rem)/3)] md:w-[calc((100%-3rem)/4)] xl:w-[calc((100%-4rem)/5)]'
 
 export default function HomePage() {
   const { hero = {} } = useSettings()
@@ -40,16 +48,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured = the store's best-selling products (rule on the server) */}
+      <CategoryStrip />
+
+      {/* Featured products: chosen by the admin (isFeatured) */}
       <section aria-labelledby="featured-title" className="container-page mt-12 sm:mt-16">
         <SectionHeading
           id="featured-title"
           title="Featured products"
-          subtitle="Our best sellers, loved by customers."
-          linkTo="/shop?sort=popular"
-          linkLabel="Shop all"
+          subtitle="Hand-picked products from our store."
+          linkTo="/shop?featured=true"
+          linkLabel="See all"
         />
-        <ProductGrid products={featured} loading={loading} error={error} onRetry={reload} emptyText="Best sellers will appear here soon." />
+        {loading || error || featured.length === 0 ? (
+          <ProductGrid
+            products={featured}
+            loading={loading}
+            error={error}
+            onRetry={reload}
+            skeletonCount={5}
+            emptyText="Featured products will appear here soon."
+          />
+        ) : (
+          <AutoCarousel
+            label="Featured products"
+            items={[...featured, SEE_MORE]}
+            getKey={(item) => item._id}
+            itemClassName={PRODUCT_SLIDE}
+            renderItem={(item) =>
+              item.seeMore ? (
+                <SeeMoreCard to="/shop?featured=true" title="See more" subtitle="Browse all featured products" />
+              ) : (
+                <ProductCard product={item} />
+              )
+            }
+          />
+        )}
       </section>
     </>
   )

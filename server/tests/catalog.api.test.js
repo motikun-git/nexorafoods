@@ -165,11 +165,19 @@ describe("Catalog API", () => {
     assert.ok(Array.isArray(body.data.hero.slides));
   });
 
-  it("GET /home returns in-stock best sellers as featured products", async () => {
+  it("GET /home returns the admin's featured products (in stock)", async () => {
     await seedCatalog();
     const { body } = await get("/home");
-    // Mango sells most but is out of stock; Potato has no sales;
-    // Hidden Onion is unpublished.
+    assert.equal(body.data.featuredSource, "admin");
+    assert.deepEqual(names(body.data.featured), ["Rice", "Banana"]);
+  });
+
+  it("GET /home falls back to best sellers when nothing is featured", async () => {
+    await seedCatalog();
+    await Product.updateMany({}, { isFeatured: false });
+    const { body } = await get("/home");
+    assert.equal(body.data.featuredSource, "bestsellers");
+    // Mango sells most but is out of stock; Potato has no sales
     assert.deepEqual(names(body.data.featured), ["Rice", "Banana", "Apple"]);
   });
 });

@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion.js'
 import Icon from '../ui/Icon.jsx'
 
-const AUTOPLAY_MS = 5000
+const AUTOPLAY_MS = 3000
 const SWIPE_MIN_PX = 40
 
 /*
  * Image slideshow for the hero.
- *  - autoplay every 5s; pauses on hover, keyboard focus, hidden tab,
+ *  - autoplay every 3s; pauses on hover, keyboard focus, hidden tab,
  *    and has a visible pause button (accessibility requirement)
  *  - no autoplay when the device asks for reduced motion
  *  - swipe left/right on touch screens, arrows + dots everywhere
