@@ -1,0 +1,31 @@
+# ===== Secrets (NEVER commit) =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ===== Dependencies =====
+node_modules/
+
+# ===== Build output =====
+dist/
+dist-ssr/
+build/
+coverage/
+
+# ===== Logs =====
+logs/
+*.log
+npm-debug.log*
+
+# ===== Uploaded files (stored in cloud later) =====
+server/uploads/
+
+# ===== Editor / OS =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.local
