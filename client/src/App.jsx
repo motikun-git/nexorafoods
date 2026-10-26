@@ -7,6 +7,7 @@ import SiteLayout from './layouts/SiteLayout.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import ProductPage from './pages/ProductPage.jsx'
 import ShopPage from './pages/ShopPage.jsx'
 
 // Old /cart links open the cart drawer on the shop page.
@@ -26,7 +27,7 @@ export default function App() {
               <Route element={<SiteLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="shop" element={<ShopPage />} />
-                <Route path="product/:slug" element={<ComingSoonPage title="Product details" />} />
+                <Route path="product/:slug" element={<ProductPage />} />
                 <Route path="cart" element={<CartRoute />} />
                 <Route path="checkout" element={<ComingSoonPage title="Checkout" />} />
                 <Route path="about" element={<ComingSoonPage title="About us" />} />
