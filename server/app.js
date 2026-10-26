@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 
 const env = require("./config/env");
 const healthRoutes = require("./routes/health.routes");
+const catalogRoutes = require("./routes/catalog.routes");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
 
 const app = express();
@@ -29,7 +30,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/health", healthRoutes);
-// Coming next: /api/categories, /api/products, /api/auth, /api/cart, /api/orders, /api/admin/...
+app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
+// Coming next: /api/auth, /api/cart, /api/orders, /api/admin/...
 
 // ---------- Errors (must be last) ----------
 app.use(notFound);
