@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, NavLink } from 'react-router'
+import { useCart } from '../../context/CartContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPhone } from '../../lib/format.js'
 import Icon from '../ui/Icon.jsx'
@@ -21,7 +22,8 @@ export default function Header() {
   const { tagline, contact } = useSettings()
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = useCallback(() => setMenuOpen(false), [])
-  const cartCount = 0 // connected to the real cart in the Cart step
+  const { cart, openDrawer } = useCart()
+  const cartCount = cart.count
 
   return (
     <>
@@ -72,7 +74,12 @@ export default function Header() {
               <Icon name="user" />
               <span className="hidden text-sm font-medium sm:inline">Account</span>
             </Link>
-            <Link to="/cart" className="icon-btn relative -mr-2 sm:mr-0 sm:w-auto sm:gap-2 sm:px-3" aria-label={`Cart, ${cartCount} items`}>
+            <button
+              type="button"
+              onClick={openDrawer}
+              className="icon-btn relative -mr-2 sm:mr-0 sm:w-auto sm:gap-2 sm:px-3"
+              aria-label={`Open cart, ${cartCount} items`}
+            >
               <span className="relative">
                 <Icon name="cart" className="size-6" />
                 <span className="absolute -right-2 -top-1.5 grid min-w-5 place-items-center rounded-full bg-accent px-1 text-[11px] font-bold leading-5 text-ink">
@@ -80,7 +87,7 @@ export default function Header() {
                 </span>
               </span>
               <span className="hidden text-sm font-medium sm:inline">Cart</span>
-            </Link>
+            </button>
           </div>
         </div>
 

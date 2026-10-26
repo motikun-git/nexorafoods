@@ -1,4 +1,5 @@
 import { NavLink, useSearchParams } from 'react-router'
+import { useCart } from '../../context/CartContext.jsx'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPhone } from '../../lib/format.js'
@@ -11,6 +12,7 @@ import { NAV_LINKS } from './navLinks.js'
 export default function MobileMenu({ open, onClose }) {
   const { tree, loading, error, reload } = useCategories()
   const { contact } = useSettings()
+  const { cart, openDrawer } = useCart()
   const [params] = useSearchParams()
 
   return (
@@ -30,7 +32,7 @@ export default function MobileMenu({ open, onClose }) {
     >
       <nav aria-label="Mobile navigation" className="p-3">
         <ul className="grid grid-cols-2 gap-2">
-          {[...NAV_LINKS, { to: '/login', label: 'My Account' }, { to: '/cart', label: 'Cart' }].map((link) => (
+          {[...NAV_LINKS, { to: '/login', label: 'My Account' }].map((link) => (
             <li key={link.to}>
               <NavLink
                 to={link.to}
@@ -46,6 +48,19 @@ export default function MobileMenu({ open, onClose }) {
               </NavLink>
             </li>
           ))}
+          <li>
+            <button
+              type="button"
+              onClick={() => {
+                onClose()
+                openDrawer()
+              }}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-line bg-white px-3 text-sm font-semibold text-ink hover:border-primary"
+            >
+              Cart
+              <span className="rounded-full bg-accent px-1.5 text-xs font-bold">{cart.count}</span>
+            </button>
+          </li>
         </ul>
       </nav>
 

@@ -1,13 +1,9 @@
 import { Link } from 'react-router'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPrice } from '../../lib/format.js'
-import Icon from '../ui/Icon.jsx'
+import AddToCartControl from '../cart/AddToCartControl.jsx'
 
-/*
- * One product tile, used on the homepage, shop and related products.
- * The "Add to cart" button is connected in the Cart step; until then the
- * card links to the product page.
- */
+// One product tile, used on the homepage, the shop and related products.
 export default function ProductCard({ product }) {
   const { currency } = useSettings()
   const href = `/product/${product.slug}`
@@ -16,7 +12,12 @@ export default function ProductCard({ product }) {
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-card">
-      <Link to={href} className="relative block aspect-[5/4] overflow-hidden bg-primary-soft sm:aspect-square" tabIndex={-1} aria-hidden="true">
+      <Link
+        to={href}
+        className="relative block aspect-[5/4] overflow-hidden bg-primary-soft sm:aspect-square"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
         {image ? (
           <img
             src={image}
@@ -47,6 +48,7 @@ export default function ProductCard({ product }) {
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <h3 className="line-clamp-2 text-sm font-semibold leading-snug sm:text-base">
+          {/* The ::after layer makes the whole card clickable */}
           <Link to={href} className="after:absolute after:inset-0 hover:text-primary">
             {product.name}
           </Link>
@@ -60,10 +62,8 @@ export default function ProductCard({ product }) {
           ) : null}
         </div>
 
-        <span className="relative mt-2.5 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-primary/25 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-          View details
-          <Icon name="arrowRight" className="size-4" />
-        </span>
+        {/* z-10 keeps the buttons above the card-wide link */}
+        <AddToCartControl product={product} className="relative z-10 mt-2.5" />
       </div>
     </article>
   )

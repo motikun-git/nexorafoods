@@ -165,11 +165,11 @@ describe("Catalog API", () => {
     assert.ok(Array.isArray(body.data.hero.slides));
   });
 
-  it("GET /home returns featured and popular without duplicates", async () => {
+  it("GET /home returns in-stock best sellers as featured products", async () => {
     await seedCatalog();
     const { body } = await get("/home");
-    assert.deepEqual(names(body.data.featured).sort(), ["Banana", "Rice"]);
-    // popular = best sellers (soldCount > 0) that are not already featured
-    assert.deepEqual(names(body.data.popular), ["Mango", "Apple"]);
+    // Mango sells most but is out of stock; Potato has no sales;
+    // Hidden Onion is unpublished.
+    assert.deepEqual(names(body.data.featured), ["Rice", "Banana", "Apple"]);
   });
 });

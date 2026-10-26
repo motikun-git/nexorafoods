@@ -1,5 +1,4 @@
 import { Link } from 'react-router'
-import CategoryStrip from '../components/home/CategoryStrip.jsx'
 import HeroSlider from '../components/home/HeroSlider.jsx'
 import SectionHeading from '../components/home/SectionHeading.jsx'
 import ProductGrid from '../components/products/ProductGrid.jsx'
@@ -11,7 +10,6 @@ export default function HomePage() {
   const { hero = {} } = useSettings()
   const { data, error, loading, reload } = useApi('/home')
   const featured = data?.data.featured || []
-  const popular = data?.data.popular || []
 
   return (
     <>
@@ -42,21 +40,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CategoryStrip />
-
-      {/* Featured: products the admin marked as featured */}
+      {/* Featured = the store's best-selling products (rule on the server) */}
       <section aria-labelledby="featured-title" className="container-page mt-12 sm:mt-16">
-        <SectionHeading id="featured-title" title="Featured products" subtitle="Explore our selected products." linkTo="/shop?featured=true" />
-        <ProductGrid products={featured} loading={loading} error={error} onRetry={reload} emptyText="No featured products yet." />
+        <SectionHeading
+          id="featured-title"
+          title="Featured products"
+          subtitle="Our best sellers, loved by customers."
+          linkTo="/shop?sort=popular"
+          linkLabel="Shop all"
+        />
+        <ProductGrid products={featured} loading={loading} error={error} onRetry={reload} emptyText="Best sellers will appear here soon." />
       </section>
-
-      {/* Popular: best sellers that are not already featured (rule on the server) */}
-      {loading || popular.length > 0 ? (
-        <section aria-labelledby="popular-title" className="container-page mt-12 sm:mt-16">
-          <SectionHeading id="popular-title" title="Popular products" subtitle="Our best-selling everyday essentials." linkTo="/shop?sort=popular" />
-          <ProductGrid products={popular} loading={loading} error={error} onRetry={reload} skeletonCount={5} />
-        </section>
-      ) : null}
     </>
   )
 }

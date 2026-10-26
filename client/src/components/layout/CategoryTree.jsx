@@ -8,11 +8,18 @@ import { categoryLink } from './CategoryMenu.jsx'
  * Used in the mobile menu now and the Shop sidebar later.
  * Tap the name to open the category; tap the arrow to expand/collapse.
  */
-export default function CategoryTree({ nodes, level = 0, activeSlug, onNavigate }) {
+export default function CategoryTree({ nodes, level = 0, activeSlug, onNavigate, linkFor = categoryLink }) {
   return (
     <ul className={level === 0 ? '' : 'ml-3 border-l border-line pl-2'}>
       {nodes.map((node) => (
-        <CategoryNode key={node._id} node={node} level={level} activeSlug={activeSlug} onNavigate={onNavigate} />
+        <CategoryNode
+          key={node._id}
+          node={node}
+          level={level}
+          activeSlug={activeSlug}
+          onNavigate={onNavigate}
+          linkFor={linkFor}
+        />
       ))}
     </ul>
   )
@@ -22,7 +29,7 @@ function containsSlug(node, slug) {
   return node.slug === slug || node.children.some((child) => containsSlug(child, slug))
 }
 
-function CategoryNode({ node, level, activeSlug, onNavigate }) {
+function CategoryNode({ node, level, activeSlug, onNavigate, linkFor }) {
   const hasChildren = node.children.length > 0
   const [expanded, setExpanded] = useState(() => Boolean(activeSlug && hasChildren && containsSlug(node, activeSlug)))
   const isActive = node.slug === activeSlug
@@ -32,7 +39,7 @@ function CategoryNode({ node, level, activeSlug, onNavigate }) {
     <li>
       <div className="flex items-center">
         <Link
-          to={categoryLink(node.slug)}
+          to={linkFor(node.slug)}
           onClick={onNavigate}
           aria-current={isActive ? 'page' : undefined}
           className={`flex min-h-11 flex-1 items-center rounded-lg px-3 text-sm transition-colors ${
@@ -59,7 +66,13 @@ function CategoryNode({ node, level, activeSlug, onNavigate }) {
       </div>
       {hasChildren && expanded ? (
         <div id={panelId}>
-          <CategoryTree nodes={node.children} level={level + 1} activeSlug={activeSlug} onNavigate={onNavigate} />
+          <CategoryTree
+            nodes={node.children}
+            level={level + 1}
+            activeSlug={activeSlug}
+            onNavigate={onNavigate}
+            linkFor={linkFor}
+          />
         </div>
       ) : null}
     </li>

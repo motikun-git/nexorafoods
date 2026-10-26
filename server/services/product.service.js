@@ -209,23 +209,15 @@ async function getPublicProductBySlug(slug) {
 }
 
 // GET /api/home
-// featured = products the admin marked as featured
-// popular  = best sellers by soldCount (> 0), excluding featured ones so the
-//            homepage never shows the same product twice
+// featured = the store's best sellers (highest soldCount, in stock first),
+//            so the homepage always shows what customers actually buy.
 async function getHomeProducts() {
   const categoryIds = await categoryService.getVisibleCategoryIds();
-  const base = { isPublished: true, category: { $in: categoryIds } };
-
   const { items: featured } = await runList(
-    { ...base, isFeatured: true },
-    { sort: { soldCount: -1, createdAt: -1, _id: 1 }, limit: HOME_LIMIT }
-  );
-  const { items: popular } = await runList(
-    { ...base, soldCount: { $gt: 0 }, _id: { $nin: featured.map((p) => p._id) } },
+    { isPublished: true, category: { $in: categoryIds }, soldCount: { $gt: 0 }, stock: { $gt: 0 } },
     { sort: SORTS.popular, limit: HOME_LIMIT }
   );
-
-  return { featured, popular };
+  return { featured };
 }
 
 module.exports = { listPublicProducts, getPublicProductBySlug, getHomeProducts, SORTS };

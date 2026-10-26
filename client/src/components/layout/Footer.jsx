@@ -48,7 +48,7 @@ export default function Footer() {
         <div>
           <h3 className="text-sm font-bold text-white">Quick links</h3>
           <ul className="mt-4 space-y-1">
-            {[...NAV_LINKS, { to: '/cart', label: 'View cart' }, { to: '/login', label: 'My account' }].map((link) => (
+            {[...NAV_LINKS, { to: '/login', label: 'My account' }].map((link) => (
               <li key={link.to}>
                 <Link to={link.to} className="inline-flex min-h-9 items-center text-sm hover:text-accent">
                   {link.label}
