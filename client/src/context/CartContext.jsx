@@ -45,6 +45,15 @@ export function CartProvider({ children }) {
 
   useEffect(() => () => clearTimeout(messageTimer.current), [])
 
+  // Load the cart again from the server (e.g. after placing an order).
+  const refresh = useCallback(
+    () =>
+      apiRequest('/cart')
+        .then((body) => applyCart(body.data))
+        .catch(() => {}),
+    [applyCart]
+  )
+
   // Runs one cart request for a product, ignoring double clicks.
   const run = useCallback(
     async (productId, request, successText) => {
@@ -84,6 +93,8 @@ export function CartProvider({ children }) {
       drawerOpen,
       openDrawer,
       closeDrawer,
+      refresh,
+      notify,
       quantityOf,
       addItem: (product, quantity = 1) =>
         run(
@@ -96,7 +107,7 @@ export function CartProvider({ children }) {
       removeItem: (productId) => run(productId, () => apiRequest(`/cart/items/${productId}`, { method: 'DELETE' })),
       dismissMessage: () => setMessage(null),
     }
-  }, [cart, loaded, pending, message, drawerOpen, openDrawer, closeDrawer, run])
+  }, [cart, loaded, pending, message, drawerOpen, openDrawer, closeDrawer, refresh, notify, run])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

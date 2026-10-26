@@ -20,6 +20,22 @@ module.exports = {
 
   currency: { code: "BDT", symbol: "৳", locale: "en-BD" },
 
+  // Delivery charge by area. freeDeliveryAbove: order subtotal that gets
+  // free delivery (null = never free).
+  delivery: {
+    insideDhaka: 60,
+    outsideDhaka: 120,
+    freeDeliveryAbove: null,
+  },
+
+  // Payment methods offered at checkout (online payment comes later).
+  payments: {
+    cashOnDelivery: true,
+  },
+
+  // Order numbers look like "NF-261026-4KQ7" (prefix + date + random).
+  orderPrefix: "NF",
+
   contact: {
     phone: "+8801313552299",
     email: "info@nexorafoods.com",

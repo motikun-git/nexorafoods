@@ -7,10 +7,12 @@ import { CategoriesProvider } from './context/CategoriesContext.jsx'
 import { SettingsProvider } from './context/SettingsContext.jsx'
 import SiteLayout from './layouts/SiteLayout.jsx'
 import AccountPage from './pages/AccountPage.jsx'
+import CheckoutPage from './pages/CheckoutPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import OrderPage from './pages/OrderPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import ShopPage from './pages/ShopPage.jsx'
@@ -49,7 +51,15 @@ export default function App() {
                     path="checkout"
                     element={
                       <RequireAuth reason="checkout">
-                        <ComingSoonPage title="Checkout" />
+                        <CheckoutPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="orders/:orderNumber"
+                    element={
+                      <RequireAuth>
+                        <OrderPage />
                       </RequireAuth>
                     }
                   />

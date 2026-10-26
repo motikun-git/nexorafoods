@@ -12,6 +12,7 @@ const catalogRoutes = require("./routes/catalog.routes");
 const settingsRoutes = require("./routes/settings.routes");
 const cartRoutes = require("./routes/cart.routes");
 const authRoutes = require("./routes/auth.routes");
+const orderRoutes = require("./routes/order.routes");
 const { loadUser } = require("./middleware/auth.middleware");
 const { requireAjaxHeader } = require("./middleware/csrf.middleware");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
@@ -44,8 +45,9 @@ app.use("/api/health", healthRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
-// Coming next: /api/orders, /api/admin/...
+// Coming next: /api/admin/...
 
 // ---------- Errors (must be last) ----------
 app.use(notFound);
