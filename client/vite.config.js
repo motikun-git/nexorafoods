@@ -10,6 +10,7 @@ export default defineConfig({
     // server, so the browser sees one origin (no CORS or cookie problems).
     proxy: {
       '/api': 'http://localhost:5000',
+      '/uploads': 'http://localhost:5000', // product images uploaded by the admin
     },
   },
 })

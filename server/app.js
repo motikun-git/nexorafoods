@@ -13,6 +13,8 @@ const settingsRoutes = require("./routes/settings.routes");
 const cartRoutes = require("./routes/cart.routes");
 const authRoutes = require("./routes/auth.routes");
 const orderRoutes = require("./routes/order.routes");
+const adminRoutes = require("./routes/admin.routes");
+const { UPLOAD_ROOT } = require("./routes/upload.routes");
 const { loadUser } = require("./middleware/auth.middleware");
 const { requireAjaxHeader } = require("./middleware/csrf.middleware");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
@@ -46,8 +48,18 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
-// Coming next: /api/admin/...
+
+// Uploaded product images (public, read-only).
+app.use(
+  "/uploads",
+  express.static(UPLOAD_ROOT, {
+    index: false,
+    dotfiles: "deny",
+    setHeaders: (res) => res.set("Cross-Origin-Resource-Policy", "cross-origin"),
+  })
+);
 
 // ---------- Errors (must be last) ----------
 app.use(notFound);
