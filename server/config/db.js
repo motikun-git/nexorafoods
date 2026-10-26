@@ -1,19 +1,13 @@
 const mongoose = require("mongoose");
+const env = require("./env");
+
+// Only fields defined in a schema can be used in queries.
+mongoose.set("strictQuery", true);
 
 async function connectDB() {
-  try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error("MONGODB_URI is missing from .env");
-    }
-
-    await mongoose.connect(process.env.MONGODB_URI);
-
-    console.log("MongoDB Atlas connected successfully!");
-    console.log("Database:", mongoose.connection.name);
-  } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
-    process.exit(1);
-  }
+  await mongoose.connect(env.mongoUri);
+  console.log("MongoDB Atlas connected successfully!");
+  console.log("Database:", mongoose.connection.name);
 }
 
 module.exports = connectDB;
