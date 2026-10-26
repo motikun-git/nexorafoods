@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { apiRequest } from '../lib/api.js'
+import { useAuth } from './AuthContext.jsx'
 
 const EMPTY_CART = { items: [], count: 0, subtotal: 0, notices: [] }
 const CartContext = createContext(null)
@@ -32,13 +33,17 @@ export function CartProvider({ children }) {
     [notify]
   )
 
+  // Reload the cart on page load and whenever the customer logs in or out
+  // (logging in merges the guest cart into the account cart).
+  const { version: authVersion } = useAuth()
   useEffect(() => {
     apiRequest('/cart')
       .then((body) => applyCart(body.data))
       .catch(() => {})
       .finally(() => setLoaded(true))
-    return () => clearTimeout(messageTimer.current)
-  }, [applyCart])
+  }, [applyCart, authVersion])
+
+  useEffect(() => () => clearTimeout(messageTimer.current), [])
 
   // Runs one cart request for a product, ignoring double clicks.
   const run = useCallback(

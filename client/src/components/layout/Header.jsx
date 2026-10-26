@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, NavLink } from 'react-router'
+import { useAuth } from '../../context/AuthContext.jsx'
 import { useCart } from '../../context/CartContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPhone } from '../../lib/format.js'
@@ -23,6 +24,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const { cart, openDrawer } = useCart()
+  const { user } = useAuth()
   const cartCount = cart.count
 
   return (
@@ -70,9 +72,15 @@ export default function Header() {
               <Icon name="chat" />
               Help
             </Link>
-            <Link to="/login" className="icon-btn sm:w-auto sm:gap-2 sm:px-3" aria-label="My account">
+            <Link
+              to={user ? '/account' : '/login'}
+              className="icon-btn sm:w-auto sm:gap-2 sm:px-3"
+              aria-label={user ? `My account (${user.name})` : 'Log in'}
+            >
               <Icon name="user" />
-              <span className="hidden text-sm font-medium sm:inline">Account</span>
+              <span className="hidden max-w-28 truncate text-sm font-medium sm:inline">
+                {user ? user.name.split(' ')[0] : 'Log in'}
+              </span>
             </Link>
             <button
               type="button"

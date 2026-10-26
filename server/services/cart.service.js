@@ -1,11 +1,15 @@
 /*
  * CART RULES
+ *  - A guest's cart is found by a random token in an httpOnly cookie.
+ *    A logged-in customer's cart is found by their user id.
  *  - Only published products from visible categories can be added.
  *  - Quantity: whole number, 1..MAX_QTY_PER_ITEM, never more than stock.
  *  - Totals are calculated here from the current product prices.
  *  - When the cart is read, items whose product was deleted, hidden or
  *    sold out are removed, and quantities above the stock are lowered;
  *    the customer gets a notice explaining what changed.
+ *
+ * "owner" = { userId, token } - userId wins when the customer is logged in.
  */
 const crypto = require("crypto");
 const Cart = require("../models/Cart");
@@ -39,9 +43,14 @@ function readProductId(value) {
   return String(value);
 }
 
-async function findCart(token) {
-  if (!token || !TOKEN_PATTERN.test(token)) return null;
-  return Cart.findOne({ token });
+function validToken(token) {
+  return typeof token === "string" && TOKEN_PATTERN.test(token);
+}
+
+async function findCart({ userId, token } = {}) {
+  if (userId) return Cart.findOne({ user: userId });
+  if (!validToken(token)) return null;
+  return Cart.findOne({ token, user: null });
 }
 
 // Loads a product that may be sold right now, or throws.
@@ -76,7 +85,7 @@ async function buildView(cart) {
       notices.push(`${product.name} is out of stock and was removed from your cart.`);
       continue;
     }
-    let quantity = item.quantity;
+    let quantity = Math.min(item.quantity, MAX_QTY_PER_ITEM);
     if (quantity > product.stock) {
       quantity = product.stock;
       notices.push(`Only ${product.stock} of ${product.name} available - quantity updated.`);
@@ -99,7 +108,8 @@ async function buildView(cart) {
     });
   }
 
-  if (notices.length) {
+  const changed = keep.length !== cart.items.length || keep.some((k, i) => k.quantity !== cart.items[i].quantity);
+  if (changed) {
     cart.items = keep;
     await cart.save();
   }
@@ -112,19 +122,19 @@ async function buildView(cart) {
   };
 }
 
-async function getCartView(token) {
-  return buildView(await findCart(token));
+async function getCartView(owner) {
+  return buildView(await findCart(owner));
 }
 
 // Returns { token, view }. Creates the cart on first add.
-async function addItem(token, productIdInput, quantityInput = 1) {
+async function addItem(owner, productIdInput, quantityInput = 1) {
   const productId = readProductId(productIdInput);
   const quantity = readQuantity(quantityInput);
   const product = await findSellableProduct(productId);
   if (product.stock <= 0) throw new ApiError(409, `${product.name} is out of stock`);
 
-  let cart = await findCart(token);
-  if (!cart) cart = new Cart({ token: newToken(), items: [] });
+  let cart = await findCart(owner);
+  if (!cart) cart = new Cart({ token: newToken(), user: owner?.userId || null, items: [] });
 
   const existing = cart.items.find((i) => String(i.product) === productId);
   const wanted = (existing?.quantity || 0) + quantity;
@@ -143,10 +153,10 @@ async function addItem(token, productIdInput, quantityInput = 1) {
 }
 
 // quantity 0 removes the item.
-async function setQuantity(token, productIdInput, quantityInput) {
+async function setQuantity(owner, productIdInput, quantityInput) {
   const productId = readProductId(productIdInput);
   const quantity = readQuantity(quantityInput, { allowZero: true });
-  const cart = await findCart(token);
+  const cart = await findCart(owner);
   const item = cart?.items.find((i) => String(i.product) === productId);
   if (!item) throw new ApiError(404, "This product is not in your cart");
 
@@ -162,9 +172,9 @@ async function setQuantity(token, productIdInput, quantityInput) {
   return buildView(cart);
 }
 
-async function removeItem(token, productIdInput) {
+async function removeItem(owner, productIdInput) {
   const productId = readProductId(productIdInput);
-  const cart = await findCart(token);
+  const cart = await findCart(owner);
   if (cart) {
     cart.items = cart.items.filter((i) => String(i.product) !== productId);
     await cart.save();
@@ -172,8 +182,8 @@ async function removeItem(token, productIdInput) {
   return buildView(cart);
 }
 
-async function clearCart(token) {
-  const cart = await findCart(token);
+async function clearCart(owner) {
+  const cart = await findCart(owner);
   if (cart) {
     cart.items = [];
     await cart.save();
@@ -181,4 +191,44 @@ async function clearCart(token) {
   return buildView(cart);
 }
 
-module.exports = { getCartView, addItem, setQuantity, removeItem, clearCart, MAX_QTY_PER_ITEM };
+/*
+ * Called right after login/register. Moves the guest cart (from the
+ * cookie) into the account:
+ *  - no account cart yet  -> the guest cart becomes the account cart
+ *  - account cart exists  -> guest items are added to it (quantities are
+ *                            combined; stock limits apply when it is read)
+ * Returns the token of the account cart (or null if there is none).
+ */
+async function attachGuestCartToUser(guestToken, userId) {
+  const guestCart = validToken(guestToken) ? await Cart.findOne({ token: guestToken, user: null }) : null;
+  let userCart = await Cart.findOne({ user: userId });
+
+  if (guestCart && !userCart) {
+    guestCart.user = userId;
+    await guestCart.save();
+    return guestCart.token;
+  }
+
+  if (guestCart && userCart) {
+    for (const guestItem of guestCart.items) {
+      const existing = userCart.items.find((i) => String(i.product) === String(guestItem.product));
+      if (existing) existing.quantity = Math.min(existing.quantity + guestItem.quantity, MAX_QTY_PER_ITEM);
+      else if (userCart.items.length < MAX_ITEMS) userCart.items.push(guestItem);
+    }
+    await userCart.save();
+    await Cart.deleteOne({ _id: guestCart._id });
+  }
+
+  return userCart ? userCart.token : null;
+}
+
+module.exports = {
+  getCartView,
+  addItem,
+  setQuantity,
+  removeItem,
+  clearCart,
+  attachGuestCartToUser,
+  findCart,
+  MAX_QTY_PER_ITEM,
+};

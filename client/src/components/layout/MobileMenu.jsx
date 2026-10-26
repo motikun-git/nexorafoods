@@ -32,7 +32,7 @@ export default function MobileMenu({ open, onClose }) {
     >
       <nav aria-label="Mobile navigation" className="p-3">
         <ul className="grid grid-cols-2 gap-2">
-          {[...NAV_LINKS, { to: '/login', label: 'My Account' }].map((link) => (
+          {[...NAV_LINKS, { to: '/account', label: 'My Account' }].map((link) => (
             <li key={link.to}>
               <NavLink
                 to={link.to}

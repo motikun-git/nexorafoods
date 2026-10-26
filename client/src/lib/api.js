@@ -20,6 +20,8 @@ export async function apiRequest(path, { method = 'GET', body, signal } = {}) {
       credentials: 'include',
       headers: {
         Accept: 'application/json',
+        // Required by the server for every change (CSRF protection).
+        'X-Requested-With': 'fetch',
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,

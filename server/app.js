@@ -11,9 +11,16 @@ const healthRoutes = require("./routes/health.routes");
 const catalogRoutes = require("./routes/catalog.routes");
 const settingsRoutes = require("./routes/settings.routes");
 const cartRoutes = require("./routes/cart.routes");
+const authRoutes = require("./routes/auth.routes");
+const { loadUser } = require("./middleware/auth.middleware");
+const { requireAjaxHeader } = require("./middleware/csrf.middleware");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
 
 const app = express();
+
+// Behind a hosting proxy (Render, Nginx...) this gives the real visitor IP
+// to the rate limiter.
+if (env.isProduction) app.set("trust proxy", 1);
 
 // ---------- Security & parsing ----------
 app.use(helmet()); // secure HTTP headers
@@ -25,6 +32,8 @@ app.use(
 );
 app.use(express.json({ limit: "100kb" })); // reject huge request bodies
 app.use(cookieParser());
+app.use("/api", requireAjaxHeader); // CSRF protection for changes
+app.use("/api", loadUser); // sets req.user when logged in
 
 // ---------- Routes ----------
 app.get("/", (req, res) => {
@@ -33,9 +42,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/health", healthRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
-// Coming next: /api/auth, /api/cart, /api/orders, /api/admin/...
+// Coming next: /api/orders, /api/admin/...
 
 // ---------- Errors (must be last) ----------
 app.use(notFound);

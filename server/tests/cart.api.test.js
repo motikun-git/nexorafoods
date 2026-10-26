@@ -19,6 +19,7 @@ function createClient() {
         method,
         headers: {
           "Content-Type": "application/json",
+          "X-Requested-With": "fetch",
           ...(cookie ? { Cookie: cookie } : {}),
         },
         body: body === undefined ? undefined : JSON.stringify(body),
@@ -147,6 +148,15 @@ describe("Cart API", () => {
     // the cleanup was saved
     const again = await client.request("GET", "");
     assert.equal(again.body.data.notices.length, 0);
+  });
+
+  it("blocks changes without the security header (CSRF protection)", async () => {
+    const response = await fetch(`${baseUrl}/items`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: products.rice._id }),
+    });
+    assert.equal(response.status, 403);
   });
 
   it("two browsers have separate carts", async () => {
