@@ -1,11 +1,16 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import RequireAdmin from './components/auth/RequireAdmin.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider, useCart } from './context/CartContext.jsx'
 import { CategoriesProvider } from './context/CategoriesContext.jsx'
 import { SettingsProvider } from './context/SettingsContext.jsx'
+import AdminLayout from './layouts/AdminLayout.jsx'
 import SiteLayout from './layouts/SiteLayout.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminOrderDetail from './pages/admin/AdminOrderDetail.jsx'
+import AdminOrders from './pages/admin/AdminOrders.jsx'
 import AccountPage from './pages/AccountPage.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
@@ -65,6 +70,24 @@ export default function App() {
                   />
                   <Route path="about" element={<ComingSoonPage title="About us" />} />
                   <Route path="contact" element={<ComingSoonPage title="Contact us" />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Route>
+
+                {/* Admin area: its own layout, admins only */}
+                <Route
+                  path="admin"
+                  element={
+                    <RequireAdmin>
+                      <AdminLayout />
+                    </RequireAdmin>
+                  }
+                >
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="orders/:orderNumber" element={<AdminOrderDetail />} />
+                  <Route path="products" element={<ComingSoonPage title="Products" />} />
+                  <Route path="categories" element={<ComingSoonPage title="Categories" />} />
+                  <Route path="settings" element={<ComingSoonPage title="Store settings" />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
               </Routes>

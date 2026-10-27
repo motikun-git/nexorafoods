@@ -68,6 +68,16 @@ export default function Header() {
           <SearchForm id="search-desktop" className="mx-auto hidden min-w-0 max-w-xl flex-1 md:flex" />
 
           <div className="flex shrink-0 items-center gap-0.5 sm:gap-1 md:ml-auto lg:ml-0">
+            {user?.role === 'admin' ? (
+              <Link
+                to="/admin"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-soft px-3 text-sm font-bold text-accent-dark hover:bg-accent hover:text-ink"
+              >
+                <Icon name="grid" className="size-4" />
+                <span className="hidden sm:inline">Admin</span>
+                <span className="sr-only sm:hidden">Admin panel</span>
+              </Link>
+            ) : null}
             <Link to="/contact" className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:text-primary xl:flex">
               <Icon name="chat" />
               Help
