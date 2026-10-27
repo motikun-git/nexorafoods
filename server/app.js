@@ -24,7 +24,7 @@ const app = express();
 
 // Behind a hosting proxy (Render, Nginx...) this gives the real visitor IP
 // to the rate limiter.
-if (env.isProduction) app.set("trust proxy", 1);
+if (env.isProduction) app.set("trust proxy", env.trustProxy);
 
 // ---------- Security & parsing ----------
 app.use(helmet()); // secure HTTP headers

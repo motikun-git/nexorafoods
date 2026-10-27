@@ -15,7 +15,18 @@ const env = {
   jwtSecret: process.env.JWT_SECRET,
   // Max login/register attempts per IP address per 15 minutes.
   authRateLimit: Number(process.env.AUTH_RATE_LIMIT) || 20,
+  // How many proxy servers sit in front of this app (hosting + frontend rewrite).
+  // Used so rate limits see each visitor's real IP address.
+  trustProxy: Number(process.env.TRUST_PROXY) || 1,
+  // Cloud image storage. When all three are set, product images go to
+  // Cloudinary; otherwise they are saved in server/uploads (development).
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+  },
 };
+env.cloudinary.enabled = Boolean(env.cloudinary.cloudName && env.cloudinary.apiKey && env.cloudinary.apiSecret);
 
 env.isProduction = env.nodeEnv === "production";
 
