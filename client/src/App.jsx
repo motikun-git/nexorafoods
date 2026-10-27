@@ -10,14 +10,16 @@ import AdminLayout from './layouts/AdminLayout.jsx'
 import SiteLayout from './layouts/SiteLayout.jsx'
 import AdminCategories from './pages/admin/AdminCategories.jsx'
 import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminMessages from './pages/admin/AdminMessages.jsx'
 import AdminOrderDetail from './pages/admin/AdminOrderDetail.jsx'
 import AdminOrders from './pages/admin/AdminOrders.jsx'
 import AdminProductForm from './pages/admin/AdminProductForm.jsx'
 import AdminProducts from './pages/admin/AdminProducts.jsx'
 import AdminSettings from './pages/admin/AdminSettings.jsx'
+import AboutPage from './pages/AboutPage.jsx'
 import AccountPage from './pages/AccountPage.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
-import ComingSoonPage from './pages/ComingSoonPage.jsx'
+import ContactPage from './pages/ContactPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
@@ -72,8 +74,8 @@ export default function App() {
                       </RequireAuth>
                     }
                   />
-                  <Route path="about" element={<ComingSoonPage title="About us" />} />
-                  <Route path="contact" element={<ComingSoonPage title="Contact us" />} />
+                  <Route path="about" element={<AboutPage />} />
+                  <Route path="contact" element={<ContactPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
 
@@ -94,6 +96,7 @@ export default function App() {
                   <Route path="products/:id" element={<AdminProductForm key="edit" />} />
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="messages" element={<AdminMessages />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
               </Routes>

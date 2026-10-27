@@ -45,6 +45,16 @@ const SECTIONS = [
     ],
   },
   {
+    title: 'About page',
+    fields: [
+      ['about.intro', 'Intro'],
+      ['about.storyTitle', 'Story title'],
+      ['about.story', 'Story ({store} = store name)'],
+      ['about.mission', 'Mission'],
+      ['about.vision', 'Vision'],
+    ],
+  },
+  {
     title: 'Homepage hero',
     fields: [
       ['hero.badge', 'Small badge text'],

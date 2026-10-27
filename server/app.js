@@ -14,6 +14,7 @@ const cartRoutes = require("./routes/cart.routes");
 const authRoutes = require("./routes/auth.routes");
 const orderRoutes = require("./routes/order.routes");
 const adminRoutes = require("./routes/admin.routes");
+const contactRoutes = require("./routes/contact.routes");
 const { UPLOAD_ROOT } = require("./routes/upload.routes");
 const { loadUser } = require("./middleware/auth.middleware");
 const { requireAjaxHeader } = require("./middleware/csrf.middleware");
@@ -49,6 +50,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/contact", contactRoutes);
 app.use("/api", catalogRoutes); // /api/categories, /api/products, /api/home
 
 // Uploaded product images (public, read-only).

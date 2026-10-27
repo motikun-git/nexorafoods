@@ -51,6 +51,15 @@ module.exports = {
     youtube: "",
   },
 
+  // About page text ({store} is replaced with the store name)
+  about: {
+    intro: "Your everyday destination for food, snacks, beverages and essential groceries. We aim to make discovering everyday products simple, convenient and enjoyable.",
+    storyTitle: "A simpler way to shop for everyday essentials.",
+    story: "{store} is an online shopping destination focused on food, beverages, snacks and other everyday essentials. Our goal is to make browsing products straightforward and shopping more convenient. From exploring categories to reviewing your cart, we want your shopping experience to feel clear, organised and easy.",
+    mission: "To provide a convenient online destination where customers can explore everyday products, compare options and manage their shopping with ease.",
+    vision: "To build a dependable and user-friendly shopping experience that keeps improving with the needs of our customers.",
+  },
+
   hero: {
     badge: "Your everyday food destination",
     title: "Everything You Love,",

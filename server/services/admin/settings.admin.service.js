@@ -70,6 +70,11 @@ const FIELDS = [
     if (typeof v !== "boolean") throw new ApiError(400, "Cash on Delivery must be on or off");
     return v;
   }],
+  ["about.intro", (v) => text(v, "About intro", 400)],
+  ["about.storyTitle", (v) => text(v, "About story title", 120)],
+  ["about.story", (v) => text(v, "About story", 1500)],
+  ["about.mission", (v) => text(v, "Mission", 400)],
+  ["about.vision", (v) => text(v, "Vision", 400)],
   ["hero.badge", (v) => text(v, "Hero badge", 60)],
   ["hero.title", (v) => text(v, "Hero title", 80)],
   ["hero.highlight", (v) => text(v, "Hero highlight", 80)],

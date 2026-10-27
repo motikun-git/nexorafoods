@@ -11,6 +11,7 @@ export const ADMIN_LINKS = [
   { to: '/admin/orders', label: 'Orders', icon: 'truck' },
   { to: '/admin/products', label: 'Products', icon: 'leaf' },
   { to: '/admin/categories', label: 'Categories', icon: 'menu' },
+  { to: '/admin/messages', label: 'Messages', icon: 'mail' },
   { to: '/admin/settings', label: 'Settings', icon: 'shield' },
 ]
 

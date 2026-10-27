@@ -11,6 +11,8 @@ const dashboard = require("../services/admin/dashboard.admin.service");
 const settings = require("../services/admin/settings.admin.service");
 const { getSettings } = require("../services/settings.service");
 const uploadRoutes = require("./upload.routes");
+const ContactMessage = require("../models/ContactMessage");
+const ApiError = require("../utils/ApiError");
 
 const router = express.Router();
 router.use(requireAdmin);
@@ -79,6 +81,25 @@ router.get("/settings", async (req, res) => {
 });
 router.patch("/settings", async (req, res) => {
   res.json({ success: true, data: await settings.updateSettings(req.body) });
+});
+
+// ---------- Contact messages ----------
+router.get("/messages", async (req, res) => {
+  const filter = ["new", "read", "replied"].includes(req.query.status) ? { status: req.query.status } : {};
+  const page = Math.max(1, Math.min(1000, Number.parseInt(req.query.page, 10) || 1));
+  const [items, total, unread] = await Promise.all([
+    ContactMessage.find(filter).sort({ createdAt: -1 }).skip((page - 1) * 20).limit(20).lean(),
+    ContactMessage.countDocuments(filter),
+    ContactMessage.countDocuments({ status: "new" }),
+  ]);
+  res.json({ success: true, data: items, unread, pagination: { page, limit: 20, total, totalPages: Math.max(1, Math.ceil(total / 20)) } });
+});
+router.patch("/messages/:id", async (req, res) => {
+  if (!categoryService.isValidId(req.params.id)) throw new ApiError(400, "Invalid id");
+  if (!["new", "read", "replied"].includes(req.body?.status)) throw new ApiError(400, "Invalid status");
+  const message = await ContactMessage.findByIdAndUpdate(req.params.id, { status: req.body.status }, { returnDocument: "after" });
+  if (!message) throw new ApiError(404, "Message not found");
+  res.json({ success: true, data: message });
 });
 
 // ---------- Image uploads ----------
