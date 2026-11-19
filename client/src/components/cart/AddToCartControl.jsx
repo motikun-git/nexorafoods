@@ -1,3 +1,5 @@
+'use client'
+
 import { useCart } from '../../context/CartContext.jsx'
 import Icon from '../ui/Icon.jsx'
 import QuantityStepper from './QuantityStepper.jsx'

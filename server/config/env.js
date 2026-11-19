@@ -18,6 +18,9 @@ const env = {
   // How many proxy servers (e.g. Nginx) sit in front of this app.
   // Used so rate limits see each visitor's real IP address.
   trustProxy: Number(process.env.TRUST_PROXY) || 1,
+  // Private address of the Next.js store (set by start.js on a live server).
+  // When set, every non-API page request is passed to it.
+  nextUrl: process.env.NEXT_URL || "",
 };
 
 env.isProduction = env.nodeEnv === "production";

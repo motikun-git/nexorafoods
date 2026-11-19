@@ -1,5 +1,8 @@
+'use client'
+
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import FormField from '../components/ui/FormField.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
@@ -27,7 +30,7 @@ export default function CheckoutPage() {
   const { user } = useAuth()
   const { cart, loaded, refresh } = useCart()
   const { currency, delivery = {}, payments = {} } = useSettings()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   // One key per visit to this page: if "Place order" is sent twice
   // (double click, slow network), the server creates only one order.
@@ -68,7 +71,7 @@ export default function CheckoutPage() {
         body: { shipping: form, paymentMethod: 'cod', idempotencyKey: checkoutKey },
       })
       await refresh() // the cart is now empty
-      navigate(`/orders/${body.data.orderNumber}?placed=1`, { replace: true })
+      router.replace(`/orders/${body.data.orderNumber}?placed=1`)
     } catch (error) {
       setServerError(error)
       if (error.status === 409) refresh() // show the updated cart
@@ -89,7 +92,7 @@ export default function CheckoutPage() {
       <section className="container-page py-20 text-center">
         <h1 className="text-2xl font-extrabold">Your cart is empty</h1>
         <p className="mt-2 text-muted">Add some products before checking out.</p>
-        <Link to="/shop" className="btn-primary mt-6">
+        <Link href="/shop" className="btn-primary mt-6">
           Go to shop
         </Link>
       </section>

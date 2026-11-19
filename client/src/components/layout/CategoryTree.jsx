@@ -1,5 +1,7 @@
+'use client'
+
 import { useState } from 'react'
-import { Link } from 'react-router'
+import Link from 'next/link'
 import Icon from '../ui/Icon.jsx'
 import { categoryLink } from './CategoryMenu.jsx'
 
@@ -39,7 +41,7 @@ function CategoryNode({ node, level, activeSlug, onNavigate, linkFor }) {
     <li>
       <div className="flex items-center">
         <Link
-          to={linkFor(node.slug)}
+          href={linkFor(node.slug)}
           onClick={onNavigate}
           aria-current={isActive ? 'page' : undefined}
           className={`flex min-h-11 flex-1 items-center rounded-lg px-3 text-sm transition-colors ${

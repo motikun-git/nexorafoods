@@ -35,8 +35,10 @@ export async function apiRequest(path, { method = 'GET', body, signal } = {}) {
   let data = null
   try {
     data = await response.json()
-  } catch {
-    // not JSON
+  } catch (error) {
+    // Cancelled while reading (the page moved on): not a real failure.
+    if (error.name === 'AbortError' || signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+    // otherwise: not JSON
   }
 
   if (!response.ok || !data?.success) {

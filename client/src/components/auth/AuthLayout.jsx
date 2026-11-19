@@ -1,3 +1,5 @@
+'use client'
+
 import { useSettings } from '../../context/SettingsContext.jsx'
 
 // Card used by the login and register pages.

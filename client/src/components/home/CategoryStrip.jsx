@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import { categoryLink } from '../layout/CategoryMenu.jsx'
 import AutoCarousel from '../ui/AutoCarousel.jsx'
@@ -26,7 +28,7 @@ export default function CategoryStrip() {
             <SeeMoreCard to="/shop" title="See more" />
           ) : (
             <Link
-              to={categoryLink(category.slug)}
+              href={categoryLink(category.slug)}
               className="flex h-full min-h-40 flex-col items-center gap-2 rounded-2xl border border-line bg-white p-3 text-center transition hover:border-primary hover:shadow-card"
             >
               {category.image ? (

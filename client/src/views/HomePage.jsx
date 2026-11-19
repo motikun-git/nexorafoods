@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import CategoryStrip from '../components/home/CategoryStrip.jsx'
 import HeroSlider from '../components/home/HeroSlider.jsx'
 import SectionHeading from '../components/home/SectionHeading.jsx'
@@ -35,11 +37,11 @@ export default function HomePage() {
             </h1>
             {hero.subtitle ? <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">{hero.subtitle}</p> : null}
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
-              <Link to={hero.ctaLink || '/shop'} className="btn-primary h-12 px-5 sm:px-6 sm:text-base">
+              <Link href={hero.ctaLink || '/shop'} className="btn-primary h-12 px-5 sm:px-6 sm:text-base">
                 {hero.ctaLabel || 'Shop now'}
                 <Icon name="arrowRight" className="size-5" />
               </Link>
-              <Link to="/shop?sort=popular" className="btn-outline h-12 px-5 sm:px-6 sm:text-base">
+              <Link href="/shop?sort=popular" className="btn-outline h-12 px-5 sm:px-6 sm:text-base">
                 Best sellers
               </Link>
             </div>

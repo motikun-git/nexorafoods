@@ -1,5 +1,8 @@
+'use client'
+
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import Icon from '../ui/Icon.jsx'
 
@@ -17,7 +20,8 @@ export default function CategoryMenu() {
   const [activeId, setActiveId] = useState(null)
   const wrapperRef = useRef(null)
   const buttonRef = useRef(null)
-  const { pathname, search } = useLocation()
+  const pathname = usePathname()
+  const search = useSearchParams().toString()
 
   const active = tree.find((c) => c._id === activeId) || tree[0]
 
@@ -87,7 +91,7 @@ export default function CategoryMenu() {
                   return (
                     <li key={category._id}>
                       <Link
-                        to={categoryLink(category.slug)}
+                        href={categoryLink(category.slug)}
                         onMouseEnter={() => setActiveId(category._id)}
                         onFocus={() => setActiveId(category._id)}
                         className={`flex items-center justify-between gap-2 px-4 py-2.5 text-sm transition-colors ${
@@ -107,7 +111,7 @@ export default function CategoryMenu() {
                   <>
                     <div className="mb-4 flex items-baseline justify-between gap-4">
                       <h3 className="text-base font-bold">{active.name}</h3>
-                      <Link to={categoryLink(active.slug)} className="shrink-0 text-sm font-semibold text-primary hover:underline">
+                      <Link href={categoryLink(active.slug)} className="shrink-0 text-sm font-semibold text-primary hover:underline">
                         View all ({active.totalProductCount})
                       </Link>
                     </div>
@@ -115,14 +119,14 @@ export default function CategoryMenu() {
                       <div className="grid grid-cols-2 gap-x-6 gap-y-5">
                         {active.children.map((child) => (
                           <div key={child._id}>
-                            <Link to={categoryLink(child.slug)} className="text-sm font-semibold text-ink hover:text-primary">
+                            <Link href={categoryLink(child.slug)} className="text-sm font-semibold text-ink hover:text-primary">
                               {child.name}
                             </Link>
                             {child.children.length ? (
                               <ul className="mt-1.5 space-y-1">
                                 {child.children.map((grandchild) => (
                                   <li key={grandchild._id}>
-                                    <Link to={categoryLink(grandchild.slug)} className="text-sm text-muted hover:text-primary">
+                                    <Link href={categoryLink(grandchild.slug)} className="text-sm text-muted hover:text-primary">
                                       {grandchild.name}
                                     </Link>
                                   </li>

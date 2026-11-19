@@ -1,3 +1,5 @@
+'use client'
+
 // [-]  2  [+]  - used on product cards and in the cart.
 export default function QuantityStepper({ quantity, max, onChange, disabled, label, size = 'md' }) {
   const button =

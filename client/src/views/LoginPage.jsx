@@ -1,5 +1,9 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Redirect from '../components/navigation/Redirect.jsx'
 import AuthLayout from '../components/auth/AuthLayout.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -15,14 +19,14 @@ const NOTICES = {
 
 export default function LoginPage() {
   const { user, ready, login } = useAuth()
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
+  const router = useRouter()
+  const params = useSearchParams()
   const next = safeNext(params.get('next'))
   const [form, setForm] = useState({ identifier: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (ready && user) return <Navigate to={next} replace />
+  if (ready && user) return <Redirect to={next} />
 
   async function onSubmit(event) {
     event.preventDefault()
@@ -34,7 +38,7 @@ export default function LoginPage() {
     setError('')
     try {
       await login(form.identifier.trim(), form.password)
-      navigate(next, { replace: true })
+      router.replace(next)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -78,7 +82,7 @@ export default function LoginPage() {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         New here?{' '}
-        <Link to={registerLink} className="font-semibold text-primary hover:underline">
+        <Link href={registerLink} className="font-semibold text-primary hover:underline">
           Create an account
         </Link>
       </p>

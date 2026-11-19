@@ -1,14 +1,16 @@
+'use client'
+
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import ProductGrid from '../components/products/ProductGrid.jsx'
 import Pagination from '../components/shop/Pagination.jsx'
 import ShopFilters from '../components/shop/ShopFilters.jsx'
 import Drawer from '../components/ui/Drawer.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import { useApi } from '../hooks/useApi.js'
+import { buildProductsQuery } from '../lib/shopQuery.js'
 
-const PAGE_SIZE = 12
-const API_KEYS = ['category', 'mode', 'search', 'minPrice', 'maxPrice', 'inStock', 'sort', 'page', 'featured']
 // Kept when the customer switches category (search and page start over).
 const KEEP_ON_CATEGORY_CHANGE = ['sort', 'inStock', 'minPrice', 'maxPrice']
 
@@ -29,7 +31,9 @@ const PRODUCT_GRID = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-col
  * shared links all show the same products.
  */
 export default function ShopPage() {
-  const [params, setParams] = useSearchParams()
+  const params = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
   const [filtersOpen, setFiltersOpen] = useState(false)
   const resultsRef = useRef(null)
   const closeFilters = useCallback(() => setFiltersOpen(false), [])
@@ -38,12 +42,7 @@ export default function ShopPage() {
   const search = params.get('search')
 
   // Only known keys go to the API.
-  const apiQuery = useMemo(() => {
-    const query = new URLSearchParams()
-    for (const key of API_KEYS) if (params.get(key)) query.set(key, params.get(key))
-    query.set('limit', String(PAGE_SIZE))
-    return query.toString()
-  }, [params])
+  const apiQuery = useMemo(() => buildProductsQuery((key) => params.get(key)), [params])
 
   const products = useApi(`/products?${apiQuery}`)
   const categoryInfo = useApi(categorySlug ? `/categories/${encodeURIComponent(categorySlug)}` : null)
@@ -56,17 +55,17 @@ export default function ShopPage() {
   // Change some filters; any change except the page goes back to page 1.
   const update = useCallback(
     (changes) => {
-      setParams((current) => {
-        const next = new URLSearchParams(current)
-        for (const [key, value] of Object.entries(changes)) {
-          if (value === '' || value === null || value === undefined) next.delete(key)
-          else next.set(key, String(value))
-        }
-        if (!('page' in changes)) next.delete('page')
-        return next
-      })
+      const next = new URLSearchParams(params.toString())
+      for (const [key, value] of Object.entries(changes)) {
+        if (value === '' || value === null || value === undefined) next.delete(key)
+        else next.set(key, String(value))
+      }
+      if (!('page' in changes)) next.delete('page')
+      const query = next.toString()
+      // Same page, new filters: keep the scroll position (like before).
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
     },
-    [setParams]
+    [params, pathname, router]
   )
 
   const linkFor = useCallback(
@@ -125,14 +124,14 @@ export default function ShopPage() {
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
-            <Link to="/" className="hover:text-primary">
+            <Link href="/" className="hover:text-primary">
               Home
             </Link>
           </li>
           <li aria-hidden="true">›</li>
           <li>
             {categorySlug ? (
-              <Link to={allProductsLink} className="hover:text-primary">
+              <Link href={allProductsLink} className="hover:text-primary">
                 Shop
               </Link>
             ) : (
@@ -142,7 +141,7 @@ export default function ShopPage() {
           {category?.breadcrumb.map((crumb) => (
             <li key={crumb._id} className="flex items-center gap-1">
               <span aria-hidden="true">›</span>
-              <Link to={linkFor(crumb.slug)} className="hover:text-primary">
+              <Link href={linkFor(crumb.slug)} className="hover:text-primary">
                 {crumb.name}
               </Link>
             </li>
@@ -214,7 +213,7 @@ export default function ShopPage() {
               {children.map((child) => (
                 <li key={child._id} className="shrink-0">
                   <Link
-                    to={linkFor(child.slug)}
+                    href={linkFor(child.slug)}
                     className="inline-flex min-h-10 items-center rounded-full border border-line bg-white px-4 text-sm font-medium hover:border-primary hover:text-primary"
                   >
                     {child.name}
@@ -253,7 +252,7 @@ export default function ShopPage() {
             {categorySlug && categoryInfo.error?.status === 404 ? (
               <div className="rounded-2xl border border-dashed border-line bg-white p-10 text-center">
                 <p className="font-semibold">This category is not available.</p>
-                <Link to="/shop" className="btn-primary mt-4">
+                <Link href="/shop" className="btn-primary mt-4">
                   See all products
                 </Link>
               </div>

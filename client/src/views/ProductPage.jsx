@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import QuantityStepper from '../components/cart/QuantityStepper.jsx'
 import { categoryLink } from '../components/layout/CategoryMenu.jsx'
 import ProductGrid from '../components/products/ProductGrid.jsx'
@@ -39,7 +42,7 @@ export default function ProductPage() {
               Try again
             </button>
           ) : null}
-          <Link to="/shop" className="btn-primary">
+          <Link href="/shop" className="btn-primary">
             Browse products
           </Link>
         </div>
@@ -52,7 +55,7 @@ export default function ProductPage() {
 }
 
 function ProductDetails({ product, breadcrumb, related }) {
-  const { currency, storeName } = useSettings()
+  const { currency } = useSettings()
   const { quantityOf, addItem, pending, openDrawer } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
@@ -63,14 +66,6 @@ function ProductDetails({ product, breadcrumb, related }) {
   const saving = product.hasDiscount ? product.price - product.finalPrice : 0
   const images = product.images || []
   const category = breadcrumb[breadcrumb.length - 1]
-
-  useEffect(() => {
-    const previous = document.title
-    document.title = `${product.name} | ${storeName}`
-    return () => {
-      document.title = previous
-    }
-  }, [product.name, storeName])
 
   async function handleAdd() {
     const ok = await addItem(product, quantity)
@@ -83,20 +78,20 @@ function ProductDetails({ product, breadcrumb, related }) {
       <nav aria-label="Breadcrumb" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-1">
           <li>
-            <Link to="/" className="hover:text-primary">
+            <Link href="/" className="hover:text-primary">
               Home
             </Link>
           </li>
           <li aria-hidden="true">›</li>
           <li>
-            <Link to="/shop" className="hover:text-primary">
+            <Link href="/shop" className="hover:text-primary">
               Shop
             </Link>
           </li>
           {breadcrumb.map((crumb) => (
             <li key={crumb._id} className="flex items-center gap-1">
               <span aria-hidden="true">›</span>
-              <Link to={categoryLink(crumb.slug)} className="hover:text-primary">
+              <Link href={categoryLink(crumb.slug)} className="hover:text-primary">
                 {crumb.name}
               </Link>
             </li>
@@ -154,7 +149,7 @@ function ProductDetails({ product, breadcrumb, related }) {
         <div>
           {category ? (
             <Link
-              to={categoryLink(category.slug)}
+              href={categoryLink(category.slug)}
               className="text-xs font-bold uppercase tracking-wider text-accent-dark hover:underline"
             >
               {category.name}

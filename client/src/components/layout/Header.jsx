@@ -1,5 +1,8 @@
+'use client'
+
 import { useCallback, useState } from 'react'
-import { Link, NavLink } from 'react-router'
+import Link from 'next/link'
+import NavLink from '../navigation/NavLink.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useCart } from '../../context/CartContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
@@ -79,12 +82,12 @@ export default function Header() {
                 <span className="sr-only sm:hidden">Admin panel</span>
               </a>
             ) : null}
-            <Link to="/contact" className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:text-primary xl:flex">
+            <Link href="/contact" className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium hover:text-primary xl:flex">
               <Icon name="chat" />
               Help
             </Link>
             <Link
-              to={user ? '/account' : '/login'}
+              href={user ? '/account' : '/login'}
               className="icon-btn sm:w-auto sm:gap-2 sm:px-3"
               aria-label={user ? `My account (${user.name})` : 'Log in'}
             >
@@ -123,7 +126,7 @@ export default function Header() {
               {NAV_LINKS.map((link) => (
                 <li key={link.to}>
                   <NavLink
-                    to={link.to}
+                    href={link.to}
                     end={link.to === '/'}
                     className={({ isActive }) =>
                       `relative py-2 text-sm font-semibold transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded-full after:transition-transform ${

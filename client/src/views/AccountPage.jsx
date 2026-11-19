@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import Icon from '../components/ui/Icon.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -12,7 +15,7 @@ import { StatusBadge, formatDate } from '../lib/orders.jsx'
 export default function AccountPage() {
   const { user, logout } = useAuth()
   const { currency } = useSettings()
-  const navigate = useNavigate()
+  const router = useRouter()
   const [loggingOut, setLoggingOut] = useState(false)
   const [page, setPage] = useState(1)
   const orders = useApi(`/orders?page=${page}`)
@@ -23,7 +26,7 @@ export default function AccountPage() {
     setLoggingOut(true)
     // Leave this protected page first; otherwise the "please log in"
     // redirect would run as soon as the user is logged out.
-    navigate('/', { replace: true })
+    router.replace('/')
     await logout()
   }
 
@@ -75,7 +78,7 @@ export default function AccountPage() {
           {orders.data && list.length === 0 ? (
             <div className="mt-4">
               <p className="text-sm text-muted">You haven’t placed any orders yet.</p>
-              <Link to="/shop" className="btn-primary mt-4">
+              <Link href="/shop" className="btn-primary mt-4">
                 Start shopping
               </Link>
             </div>
@@ -86,7 +89,7 @@ export default function AccountPage() {
               {list.map((order) => (
                 <li key={order._id}>
                   <Link
-                    to={`/orders/${order.orderNumber}`}
+                    href={`/orders/${order.orderNumber}`}
                     className="-mx-2 flex items-center justify-between gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-cream"
                   >
                     <span className="min-w-0">

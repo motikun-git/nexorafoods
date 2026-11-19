@@ -1,3 +1,5 @@
+'use client'
+
 import Icon from '../ui/Icon.jsx'
 
 // Page numbers around the current page: 1 … 4 5 [6] 7 8 … 20

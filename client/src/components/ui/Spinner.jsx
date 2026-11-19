@@ -1,3 +1,5 @@
+'use client'
+
 export default function Spinner({ label = 'Loading', className = '' }) {
   return (
     <div role="status" className={`flex items-center gap-3 text-muted ${className}`}>

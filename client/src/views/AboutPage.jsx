@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import Icon from '../components/ui/Icon.jsx'
 import { useSettings } from '../context/SettingsContext.jsx'
 
@@ -24,11 +26,11 @@ export default function AboutPage() {
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-muted sm:text-lg">{fill(about.intro)}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link to="/shop" className="btn-primary h-12 px-6">
+            <Link href="/shop" className="btn-primary h-12 px-6">
               {hero.ctaLabel || 'Explore products'}
               <Icon name="arrowRight" className="size-5" />
             </Link>
-            <Link to="/contact" className="btn-outline h-12 px-6">
+            <Link href="/contact" className="btn-outline h-12 px-6">
               Contact us
             </Link>
           </div>

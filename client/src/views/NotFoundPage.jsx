@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 
 export default function NotFoundPage() {
   return (
@@ -7,10 +9,10 @@ export default function NotFoundPage() {
       <h1 className="mt-2 text-3xl font-extrabold">Page not found</h1>
       <p className="mx-auto mt-3 max-w-md text-muted">The page you are looking for doesn&apos;t exist or has been moved.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <Link to="/" className="btn-primary">
+        <Link href="/" className="btn-primary">
           Go to homepage
         </Link>
-        <Link to="/shop" className="btn-outline">
+        <Link href="/shop" className="btn-outline">
           Browse products
         </Link>
       </div>

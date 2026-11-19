@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import { useCart } from '../../context/CartContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPrice } from '../../lib/format.js'
@@ -27,7 +29,7 @@ export default function CartDrawer() {
               <span className="text-xl font-extrabold">{formatPrice(cart.subtotal, currency)}</span>
             </div>
             <p className="mt-1 text-xs text-muted">Delivery charge is calculated at checkout.</p>
-            <Link to="/checkout" onClick={closeDrawer} className="btn-primary mt-4 h-12 w-full text-base">
+            <Link href="/checkout" onClick={closeDrawer} className="btn-primary mt-4 h-12 w-full text-base">
               Proceed to checkout
               <Icon name="arrowRight" className="size-5" />
             </Link>
@@ -45,7 +47,7 @@ export default function CartDrawer() {
           </span>
           <h3 className="mt-4 text-lg font-bold">Your cart is empty</h3>
           <p className="mt-1 text-sm text-muted">Add some products and they will appear here.</p>
-          <Link to="/shop" onClick={closeDrawer} className="btn-primary mt-6">
+          <Link href="/shop" onClick={closeDrawer} className="btn-primary mt-6">
             Start shopping
           </Link>
         </div>
@@ -56,7 +58,7 @@ export default function CartDrawer() {
             return (
               <li key={item.productId} className={`flex gap-3 p-4 transition-opacity ${busy ? 'opacity-60' : ''}`}>
                 <Link
-                  to={`/product/${item.slug}`}
+                  href={`/product/${item.slug}`}
                   onClick={closeDrawer}
                   className="grid size-18 shrink-0 place-items-center overflow-hidden rounded-xl bg-primary-soft"
                   tabIndex={-1}
@@ -73,7 +75,7 @@ export default function CartDrawer() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <Link
-                        to={`/product/${item.slug}`}
+                        href={`/product/${item.slug}`}
                         onClick={closeDrawer}
                         className="line-clamp-2 text-sm font-semibold hover:text-primary"
                       >

@@ -1,3 +1,5 @@
+'use client'
+
 import ProductCard from './ProductCard.jsx'
 
 // Responsive grid: 2 columns on phones up to 5 on large screens.

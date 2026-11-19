@@ -1,4 +1,7 @@
-import { Navigate, useLocation } from 'react-router'
+'use client'
+
+import { usePathname, useSearchParams } from 'next/navigation'
+import Redirect from '../navigation/Redirect.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import Spinner from '../ui/Spinner.jsx'
 
@@ -10,7 +13,8 @@ import Spinner from '../ui/Spinner.jsx'
  */
 export default function RequireAuth({ children, reason }) {
   const { user, ready } = useAuth()
-  const location = useLocation()
+  const pathname = usePathname()
+  const search = useSearchParams().toString()
 
   if (!ready) {
     return (
@@ -21,8 +25,8 @@ export default function RequireAuth({ children, reason }) {
   }
 
   if (!user) {
-    const next = encodeURIComponent(location.pathname + location.search)
-    return <Navigate to={`/login?next=${next}${reason ? `&reason=${reason}` : ''}`} replace />
+    const next = encodeURIComponent(pathname + (search ? `?${search}` : ''))
+    return <Redirect to={`/login?next=${next}${reason ? `&reason=${reason}` : ''}`} />
   }
 
   return children

@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPhone } from '../../lib/format.js'
@@ -50,7 +52,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-1">
             {[...NAV_LINKS, { to: '/account', label: 'My account' }].map((link) => (
               <li key={link.to}>
-                <Link to={link.to} className="inline-flex min-h-9 items-center text-sm hover:text-accent">
+                <Link href={link.to} className="inline-flex min-h-9 items-center text-sm hover:text-accent">
                   {link.label}
                 </Link>
               </li>
@@ -63,7 +65,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-1">
             {tree.slice(0, 6).map((category) => (
               <li key={category._id}>
-                <Link to={categoryLink(category.slug)} className="inline-flex min-h-9 items-center text-sm hover:text-accent">
+                <Link href={categoryLink(category.slug)} className="inline-flex min-h-9 items-center text-sm hover:text-accent">
                   {category.name}
                 </Link>
               </li>

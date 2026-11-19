@@ -1,3 +1,5 @@
+'use client'
+
 import { useCart } from '../../context/CartContext.jsx'
 
 const STYLES = {

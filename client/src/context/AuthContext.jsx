@@ -1,4 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
+'use client'
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { apiRequest } from '../lib/api.js'
 

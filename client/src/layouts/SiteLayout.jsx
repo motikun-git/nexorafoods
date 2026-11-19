@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
-import { Outlet, useLocation } from 'react-router'
+'use client'
+
+import { usePathname } from 'next/navigation'
 import CartDrawer from '../components/cart/CartDrawer.jsx'
 import FloatingCartButton from '../components/cart/FloatingCartButton.jsx'
 import Footer from '../components/layout/Footer.jsx'
@@ -10,14 +11,9 @@ import Toast from '../components/ui/Toast.jsx'
 const NO_FLOATING_CART = ['/checkout', '/cart']
 
 // Shared frame for every customer page: header, page content, footer, cart.
-export default function SiteLayout() {
-  const { pathname } = useLocation()
+export default function SiteLayout({ children }) {
+  const pathname = usePathname()
   const showFloatingCart = !NO_FLOATING_CART.some((path) => pathname.startsWith(path))
-
-  // Start each new page at the top.
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [pathname])
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -29,7 +25,7 @@ export default function SiteLayout() {
       </a>
       <Header />
       <main id="main" className="flex-1">
-        <Outlet />
+        {children}
       </main>
       <Footer />
       {/* Space so the floating button never covers the end of the footer */}

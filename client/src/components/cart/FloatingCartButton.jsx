@@ -1,3 +1,5 @@
+'use client'
+
 import { useCart } from '../../context/CartContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPrice } from '../../lib/format.js'

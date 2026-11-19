@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import FormField from '../components/ui/FormField.jsx'
 import Icon from '../components/ui/Icon.jsx'

@@ -16,9 +16,12 @@ export function useApi(path) {
     setState((s) => ({ ...s, loading: true, error: null }))
 
     apiGet(path, { signal: controller.signal })
-      .then((body) => setState({ data: body, error: null, loading: false }))
+      .then((body) => {
+        if (!controller.signal.aborted) setState({ data: body, error: null, loading: false })
+      })
       .catch((error) => {
-        if (error.name !== 'AbortError') setState({ data: null, error, loading: false })
+        // An old request finishing late must not replace newer data.
+        if (!controller.signal.aborted && error.name !== 'AbortError') setState({ data: null, error, loading: false })
       })
 
     return () => controller.abort()

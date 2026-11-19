@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router'
+import Link from 'next/link'
+import { useParams, useSearchParams } from 'next/navigation'
 import Icon from '../components/ui/Icon.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 import { useSettings } from '../context/SettingsContext.jsx'
@@ -11,7 +14,7 @@ import { AREA_LABEL, ORDER_STATUS, ORDER_STEPS, StatusBadge, formatDate } from '
 // One order: confirmation after checkout, and details from "My orders".
 export default function OrderPage() {
   const { orderNumber } = useParams()
-  const [params] = useSearchParams()
+  const params = useSearchParams()
   const justPlaced = params.get('placed') === '1'
   const { data, error, loading } = useApi(`/orders/${encodeURIComponent(orderNumber)}`)
   const { currency } = useSettings()
@@ -34,7 +37,7 @@ export default function OrderPage() {
       <section className="container-page py-20 text-center">
         <h1 className="text-2xl font-extrabold">Order not found</h1>
         <p className="mt-2 text-muted">{error.status === 404 ? 'We couldn’t find this order in your account.' : error.message}</p>
-        <Link to="/account" className="btn-primary mt-6">
+        <Link href="/account" className="btn-primary mt-6">
           My orders
         </Link>
       </section>
@@ -110,7 +113,7 @@ export default function OrderPage() {
             {current.items.map((item) => (
               <li key={item.product} className="flex justify-between gap-3 py-3 text-sm">
                 <span className="min-w-0">
-                  <Link to={`/product/${item.slug}`} className="block truncate font-medium hover:text-primary">
+                  <Link href={`/product/${item.slug}`} className="block truncate font-medium hover:text-primary">
                     {item.name}
                   </Link>
                   <span className="text-xs text-muted">
@@ -171,11 +174,11 @@ export default function OrderPage() {
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/shop" className="btn-primary">
+        <Link href="/shop" className="btn-primary">
           Continue shopping
           <Icon name="arrowRight" className="size-4" />
         </Link>
-        <Link to="/account" className="btn-outline">
+        <Link href="/account" className="btn-outline">
           My orders
         </Link>
       </div>

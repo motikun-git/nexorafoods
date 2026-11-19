@@ -1,5 +1,9 @@
+'use client'
+
 import { useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Redirect from '../components/navigation/Redirect.jsx'
 import AuthLayout from '../components/auth/AuthLayout.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -21,15 +25,15 @@ function validate(form) {
 
 export default function RegisterPage() {
   const { user, ready, register } = useAuth()
-  const navigate = useNavigate()
-  const [params] = useSearchParams()
+  const router = useRouter()
+  const params = useSearchParams()
   const next = safeNext(params.get('next'))
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (ready && user) return <Navigate to={next} replace />
+  if (ready && user) return <Redirect to={next} />
 
   async function onSubmit(event) {
     event.preventDefault()
@@ -41,7 +45,7 @@ export default function RegisterPage() {
     setServerError('')
     try {
       await register({ name: form.name.trim(), email: form.email.trim(), phone: form.phone, password: form.password })
-      navigate(next, { replace: true })
+      router.replace(next)
     } catch (err) {
       setServerError(err.message)
     } finally {
@@ -106,7 +110,7 @@ export default function RegisterPage() {
       </form>
       <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{' '}
-        <Link to={`/login${params.toString() ? `?${params}` : ''}`} className="font-semibold text-primary hover:underline">
+        <Link href={`/login${params.toString() ? `?${params}` : ''}`} className="font-semibold text-primary hover:underline">
           Log in
         </Link>
       </p>

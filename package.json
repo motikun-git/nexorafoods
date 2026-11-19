@@ -1,10 +1,10 @@
 {
   "name": "nexora-food",
   "private": true,
-  "description": "Builds the store and the admin panel and starts the API, as one web app.",
+  "description": "Builds the store (Next.js) and the admin panel (React) and starts them with the API.",
   "scripts": {
-    "build": "npm --prefix client ci --include=dev && npm --prefix client run build && npm --prefix admin ci --include=dev && npm --prefix admin run build && npm --prefix server ci --omit=dev",
-    "start": "npm --prefix server start"
+    "build": "npm --prefix admin ci --include=dev && npm --prefix admin run build && npm --prefix client ci --include=dev && npm --prefix client run build && npm --prefix server ci --omit=dev",
+    "start": "node start.js"
   },
   "engines": {
     "node": ">=20"

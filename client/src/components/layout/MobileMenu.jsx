@@ -1,4 +1,7 @@
-import { NavLink, useSearchParams } from 'react-router'
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+import NavLink from '../navigation/NavLink.jsx'
 import { useCart } from '../../context/CartContext.jsx'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import { useSettings } from '../../context/SettingsContext.jsx'
@@ -13,7 +16,7 @@ export default function MobileMenu({ open, onClose }) {
   const { tree, loading, error, reload } = useCategories()
   const { contact } = useSettings()
   const { cart, openDrawer } = useCart()
-  const [params] = useSearchParams()
+  const params = useSearchParams()
 
   return (
     <Drawer
@@ -35,7 +38,7 @@ export default function MobileMenu({ open, onClose }) {
           {[...NAV_LINKS, { to: '/account', label: 'My Account' }].map((link) => (
             <li key={link.to}>
               <NavLink
-                to={link.to}
+                href={link.to}
                 end={link.to === '/'}
                 onClick={onClose}
                 className={({ isActive }) =>

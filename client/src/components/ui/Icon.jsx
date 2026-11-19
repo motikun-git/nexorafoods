@@ -1,3 +1,5 @@
+'use client'
+
 // Small inline SVG icon set (no external icon library or CDN needed).
 const PATHS = {
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,

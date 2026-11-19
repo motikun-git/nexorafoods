@@ -1,8 +1,7 @@
 // One place for talking to the backend.
-// In development, Vite forwards /api to localhost:5000 (see vite.config.js).
-// In production the same server serves the site and the API, so this stays empty.
-// Set VITE_API_URL only if the API is on a different address.
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+// "/api/..." is forwarded to the Express server by next.config.mjs.
+// Set NEXT_PUBLIC_API_URL only if the API is on a different address.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 export class ApiError extends Error {
   constructor(message, status, details) {
@@ -35,8 +34,10 @@ export async function apiRequest(path, { method = 'GET', body, signal } = {}) {
   let data = null
   try {
     data = await response.json()
-  } catch {
-    // not JSON
+  } catch (error) {
+    // Cancelled while reading (the page moved on): not a real failure.
+    if (error.name === 'AbortError' || signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+    // otherwise: not JSON
   }
 
   if (!response.ok || !data?.success) {

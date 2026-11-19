@@ -21,23 +21,21 @@ const { UPLOAD_ROOT } = require("./routes/upload.routes");
 const { loadUser } = require("./middleware/auth.middleware");
 const { requireAjaxHeader } = require("./middleware/csrf.middleware");
 const { notFound, errorHandler } = require("./middleware/error.middleware");
+const { createStoreProxy } = require("./utils/storeProxy");
 const ApiError = require("./utils/ApiError");
 
 const app = express();
+const storeProxy = env.nextUrl ? createStoreProxy(env.nextUrl) : null;
 
 // Behind a proxy (e.g. Nginx) this gives the real visitor IP
 // to the rate limiter.
 if (env.isProduction) app.set("trust proxy", env.trustProxy);
 
 // ---------- Security & parsing ----------
-// The built apps. When they exist (on the hosting server) this one server
-// shows the store, the admin panel and the API from the same address:
-//   /admin/...  -> admin panel (admin/dist)
-//   /api/...    -> API
-//   everything else -> store (client/dist)
-const CLIENT_DIST = path.join(__dirname, "..", "client", "dist");
-const CLIENT_INDEX = path.join(CLIENT_DIST, "index.html");
-const servesClient = fs.existsSync(CLIENT_INDEX);
+// On a live server this one address serves everything:
+//   /api/...    -> API (this app)
+//   /admin/...  -> admin panel (admin/dist, when it has been built)
+//   everything else -> the store (Next.js at NEXT_URL, when it is set)
 const ADMIN_DIST = path.join(__dirname, "..", "admin", "dist");
 const ADMIN_INDEX = path.join(ADMIN_DIST, "index.html");
 const servesAdmin = fs.existsSync(ADMIN_INDEX);
@@ -67,7 +65,7 @@ app.use("/api", requireAjaxHeader); // CSRF protection for changes
 app.use("/api", loadUser); // sets req.user when logged in
 
 // ---------- Routes ----------
-if (!servesClient) {
+if (!env.nextUrl) {
   app.get("/", (req, res) => {
     res.json({ success: true, message: "Nexora Food API is running!" });
   });
@@ -110,19 +108,11 @@ if (servesAdmin) {
   });
 }
 
-// ---------- Website (production build) ----------
-if (servesClient) {
-  // Files with a content hash in the name never change: cache for a year.
-  app.use(
-    "/assets",
-    express.static(path.join(CLIENT_DIST, "assets"), { immutable: true, maxAge: "1y", index: false })
-  );
-  app.use(express.static(CLIENT_DIST, { index: false, maxAge: "1h" }));
-  // Every other page address (/shop, /account...) is handled by React.
+// ---------- Store (Next.js) ----------
+if (env.nextUrl) {
   app.use((req, res, next) => {
-    if (req.method !== "GET" || req.path.startsWith("/api") || req.path.startsWith("/uploads")) return next();
-    res.set("Cache-Control", "no-cache");
-    res.sendFile(CLIENT_INDEX);
+    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) return next(); // unknown API address -> 404 below
+    storeProxy(req, res);
   });
 }
 

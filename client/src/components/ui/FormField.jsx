@@ -1,3 +1,5 @@
+'use client'
+
 import { useId, useState } from 'react'
 
 // Label + input + help/error text, with a show/hide button for passwords.

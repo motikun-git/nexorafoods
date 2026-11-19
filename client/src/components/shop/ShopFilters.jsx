@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import Link from 'next/link'
 import { useCategories } from '../../context/CategoriesContext.jsx'
 import CategoryTree from '../layout/CategoryTree.jsx'
 
@@ -35,7 +37,7 @@ export default function ShopFilters({ params, update, linkFor, allProductsLink, 
           Categories
         </h2>
         <Link
-          to={allProductsLink}
+          href={allProductsLink}
           onClick={onNavigate}
           aria-current={!activeSlug ? 'page' : undefined}
           className={`mt-2 flex min-h-11 items-center rounded-lg px-3 text-sm font-medium transition-colors ${

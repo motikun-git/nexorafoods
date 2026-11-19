@@ -2,11 +2,11 @@
 
 Three parts, one database:
 
-| Folder   | What it is                                   | Local address                  |
-|----------|----------------------------------------------|--------------------------------|
-| `server` | API (Express + MongoDB)                      | http://localhost:5000          |
-| `client` | Store for customers (React)                  | http://localhost:5173          |
-| `admin`  | Admin panel (React), separate from the store | http://localhost:5174/admin    |
+| Folder   | What it is                                      | Local address                  |
+|----------|-------------------------------------------------|--------------------------------|
+| `server` | API (Express + MongoDB)                         | http://localhost:5000          |
+| `client` | Store for customers (**Next.js**, SEO-friendly) | http://localhost:5173          |
+| `admin`  | Admin panel (React + Vite)                      | http://localhost:5174/admin    |
 
 ## Run on your PC (3 terminals)
 
@@ -24,10 +24,12 @@ Admin rights: `cd server; npm.cmd run make-admin -- you@example.com`
 ## On a live server
 
 ```bash
-npm run build   # builds client/ and admin/, installs server/
-npm start       # starts the server
+npm run build   # builds admin/ and client/, installs server/
+npm start       # starts the API (public, PORT) and the store (private)
 ```
 
-The server then shows the store at `/`, the admin panel at `/admin` and the API at `/api`.
-Set the variables from `server/.env.example` (with `NODE_ENV=production`).
+Visitors only talk to the Express server on `PORT`: it answers `/api` and
+`/admin` itself and passes every store page to Next.js (see `start.js`).
+Set the variables from `server/.env.example` (with `NODE_ENV=production`),
+and `SITE_URL` (e.g. `https://www.yourshop.com`) for the sitemap.
 Uploaded product images are saved in `server/uploads`.

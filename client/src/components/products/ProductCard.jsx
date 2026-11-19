@@ -1,4 +1,6 @@
-import { Link } from 'react-router'
+'use client'
+
+import Link from 'next/link'
 import { useSettings } from '../../context/SettingsContext.jsx'
 import { formatPrice } from '../../lib/format.js'
 import AddToCartControl from '../cart/AddToCartControl.jsx'
@@ -13,7 +15,7 @@ export default function ProductCard({ product }) {
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-card">
       <Link
-        to={href}
+        href={href}
         className="relative block aspect-[5/4] overflow-hidden bg-primary-soft sm:aspect-square"
         tabIndex={-1}
         aria-hidden="true"
@@ -49,7 +51,7 @@ export default function ProductCard({ product }) {
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <h3 className="line-clamp-2 text-sm font-semibold leading-snug sm:text-base">
           {/* The ::after layer makes the whole card clickable */}
-          <Link to={href} className="after:absolute after:inset-0 hover:text-primary">
+          <Link href={href} className="after:absolute after:inset-0 hover:text-primary">
             {product.name}
           </Link>
         </h3>

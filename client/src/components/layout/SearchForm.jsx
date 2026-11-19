@@ -1,12 +1,14 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useSearchParams } from 'react-router'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Icon from '../ui/Icon.jsx'
 
 // Product search. Sends the user to /shop?search=... (works from any page).
 export default function SearchForm({ className = '', id = 'site-search' }) {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const [params] = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const params = useSearchParams()
   const current = pathname === '/shop' ? params.get('search') || '' : ''
   const [text, setText] = useState(current)
 
@@ -16,7 +18,7 @@ export default function SearchForm({ className = '', id = 'site-search' }) {
   function onSubmit(event) {
     event.preventDefault()
     const query = text.trim()
-    navigate(query ? `/shop?search=${encodeURIComponent(query)}` : '/shop')
+    router.push(query ? `/shop?search=${encodeURIComponent(query)}` : '/shop')
   }
 
   return (
