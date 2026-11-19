@@ -66,7 +66,16 @@ const SECTIONS = [
   },
 ]
 
-const MAX_SLIDES = 8
+const MAX_SLIDES = 20
+// Uploading slideshow photos is turned off for now: images are added as
+// links instead. Set to true to show the upload box again.
+const SHOW_SLIDE_UPLOAD = false
+// Same rule as the server: a full https:// address, or a path on this site.
+const IMAGE_LINK = /^(https:\/\/[^\s"'<>]+|\/[A-Za-z0-9/_.-]+)$/
+
+// Every slide row gets its own id, so typing in a link never mixes up rows.
+let nextSlideRowId = 0
+const toSlideRows = (slides = []) => slides.map((slide) => ({ ...slide, rowId: ++nextSlideRowId }))
 
 const get = (obj, path) => path.split('.').reduce((v, k) => (v == null ? undefined : v[k]), obj)
 function set(obj, path, value) {
@@ -88,7 +97,7 @@ export default function AdminSettings() {
   const [slideUploading, setSlideUploading] = useState(false)
 
   useEffect(() => {
-    if (data) setValues(data.data)
+    if (data) setValues({ ...data.data, hero: { ...data.data.hero, slides: toSlideRows(data.data.hero?.slides) } })
   }, [data])
 
   if (loading || !values) return error ? <p className="text-red-600">{error.message}</p> : <Spinner label="Loading settings" />
@@ -118,7 +127,7 @@ export default function AdminSettings() {
     setSlideUploading(true)
     try {
       const added = []
-      for (const file of files) added.push({ image: await uploadImage(file), alt: '' })
+      for (const file of files) added.push({ image: await uploadImage(file), alt: '', rowId: ++nextSlideRowId })
       setValues((v) => set(v, 'hero.slides', [...(v.hero?.slides || []), ...added]))
     } catch (err) {
       notify(err.message, 'error')
@@ -126,6 +135,9 @@ export default function AdminSettings() {
       setSlideUploading(false)
     }
   }
+
+  const addSlideLink = () => setSlides([...slides, { image: '', alt: '', rowId: ++nextSlideRowId }])
+  const updateSlide = (rowId, changes) => setSlides(slides.map((slide) => (slide.rowId === rowId ? { ...slide, ...changes } : slide)))
 
   function moveSlide(index, step) {
     const target = index + step
@@ -137,11 +149,16 @@ export default function AdminSettings() {
 
   async function onSubmit(event) {
     event.preventDefault()
-    if (slides.length === 0) {
-      notify('Keep at least one hero image.', 'error')
+    // Empty rows are skipped; every other link must be a valid address.
+    const filledSlides = slides
+      .map(({ rowId: _rowId, ...slide }) => ({ ...slide, image: slide.image.trim(), alt: (slide.alt || '').trim() }))
+      .filter((slide) => slide.image)
+    const badIndex = filledSlides.findIndex((slide) => !IMAGE_LINK.test(slide.image))
+    if (badIndex !== -1) {
+      notify(`Image link ${badIndex + 1} must start with https://`, 'error')
       return
     }
-    let body = { logo: values.logo || '', hero: { slides } }
+    let body = { logo: values.logo || '', hero: { slides: filledSlides } }
     for (const section of SECTIONS) {
       for (const [path, , type] of section.fields) {
         let value = get(values, path)
@@ -182,54 +199,98 @@ export default function AdminSettings() {
       <section className="mt-5 rounded-2xl border border-line bg-white p-4 sm:p-5">
         <h2 className="font-bold">Homepage slideshow images</h2>
         <p className="mt-1 text-sm text-muted">
-          1 to {MAX_SLIDES} images, changing every 3 seconds. Wide photos look best (about 4:3). JPEG, PNG or WEBP, up to 2 MB. Use the arrows to change the order.
+          Paste image links (addresses starting with https://). They change every 3 seconds, in this order. Wide photos look best
+          (about 4:3). Leave the list empty to show no slideshow.
         </p>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {slides.map((slide, i) => (
-            <li key={slide.image} className="overflow-hidden rounded-xl border border-line">
-              <div className="relative">
-                <img src={slide.image} alt="" className="aspect-[4/3] w-full object-cover" />
-                <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold">{i + 1}</span>
-              </div>
-              <div className="space-y-2 p-3">
-                <label className="block text-xs font-semibold">
-                  Short description (for blind users &amp; Google)
-                  <input
-                    value={slide.alt || ''}
-                    maxLength={120}
-                    onChange={(e) => setSlides(slides.map((s, j) => (j === i ? { ...s, alt: e.target.value } : s)))}
-                    placeholder="e.g. A basket of fresh vegetables"
-                    className={input}
-                  />
-                </label>
-                <div className="flex gap-2">
-                  <button type="button" onClick={() => moveSlide(i, -1)} disabled={i === 0} className="btn-outline min-h-10 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} earlier`}>
-                    ←
-                  </button>
-                  <button type="button" onClick={() => moveSlide(i, 1)} disabled={i === slides.length - 1} className="btn-outline min-h-10 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} later`}>
-                    →
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSlides(slides.filter((_, j) => j !== i))}
-                    disabled={slides.length === 1}
-                    className="min-h-10 flex-1 rounded-full border border-red-200 px-3 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-30"
-                  >
-                    Remove
-                  </button>
+        <ul className="mt-3 space-y-3">
+          {slides.map((slide, i) => {
+            const linkIsValid = IMAGE_LINK.test(slide.image.trim())
+            return (
+              <li key={slide.rowId} className="flex flex-col gap-3 rounded-xl border border-line p-3 sm:flex-row">
+                <div className="relative grid aspect-[4/3] w-full shrink-0 place-items-center overflow-hidden rounded-lg bg-cream text-center text-xs text-muted sm:w-40">
+                  {linkIsValid ? (
+                    // Shown only if the picture cannot be loaded (the image covers it otherwise).
+                    <span className="absolute inset-0 grid place-items-center px-2">Cannot load this image</span>
+                  ) : null}
+                  {linkIsValid ? (
+                    <img
+                      src={slide.image.trim()}
+                      alt=""
+                      className="relative size-full object-cover"
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                      onLoad={(e) => (e.currentTarget.style.display = '')}
+                    />
+                  ) : (
+                    <span className="px-2">{slide.image.trim() ? 'Link must start with https://' : 'Preview'}</span>
+                  )}
+                  <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold">{i + 1}</span>
                 </div>
-              </div>
-            </li>
-          ))}
-          {slides.length < MAX_SLIDES ? (
-            <li>
-              <label className={`grid aspect-[4/3] h-full min-h-40 cursor-pointer place-items-center rounded-xl border-2 border-dashed border-line text-sm font-semibold text-muted hover:border-primary hover:text-primary ${slideUploading ? 'pointer-events-none opacity-60' : ''}`}>
-                {slideUploading ? 'Uploading…' : '+ Add image'}
-                <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onSlideUpload} />
-              </label>
-            </li>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <label className="block text-xs font-semibold">
+                    Image link
+                    <input
+                      // Plain text box (not type="url"): links to this site's own
+                      // images, like /images/..., are allowed too; checked on save.
+                      type="text"
+                      inputMode="url"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={slide.image}
+                      maxLength={500}
+                      // A new link replaces the old picture completely.
+                      onChange={(e) => updateSlide(slide.rowId, { image: e.target.value, imageSmall: undefined })}
+                      placeholder="https://example.com/photo.jpg"
+                      aria-invalid={slide.image.trim() && !linkIsValid ? true : undefined}
+                      className={`${input} ${slide.image.trim() && !linkIsValid ? 'border-red-500' : ''}`}
+                    />
+                  </label>
+                  <label className="block text-xs font-semibold">
+                    Short description (for blind users &amp; Google)
+                    <input
+                      value={slide.alt || ''}
+                      maxLength={120}
+                      onChange={(e) => updateSlide(slide.rowId, { alt: e.target.value })}
+                      placeholder="e.g. A basket of fresh vegetables"
+                      className={input}
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => moveSlide(i, -1)} disabled={i === 0} className="btn-outline min-h-10 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} earlier`}>
+                      ←
+                    </button>
+                    <button type="button" onClick={() => moveSlide(i, 1)} disabled={i === slides.length - 1} className="btn-outline min-h-10 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} later`}>
+                      →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSlides(slides.filter((other) => other.rowId !== slide.rowId))}
+                      className="min-h-10 flex-1 rounded-full border border-red-200 px-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </li>
+            )
+          })}
+          {slides.length === 0 ? (
+            <li className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">No slideshow images yet.</li>
           ) : null}
         </ul>
+        <div className="mt-3 flex flex-wrap gap-3">
+          {slides.length < MAX_SLIDES ? (
+            <button type="button" onClick={addSlideLink} className="btn-outline">
+              + Add image link
+            </button>
+          ) : null}
+          {/* Upload option: kept for later, hidden for now (see SHOW_SLIDE_UPLOAD). */}
+          {SHOW_SLIDE_UPLOAD && slides.length < MAX_SLIDES ? (
+            <label className={`btn-outline cursor-pointer ${slideUploading ? 'pointer-events-none opacity-60' : ''}`}>
+              {slideUploading ? 'Uploading…' : '+ Upload image'}
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onSlideUpload} />
+            </label>
+          ) : null}
+        </div>
         <p className="mt-2 text-xs text-muted">Changes appear on the homepage after you press “Save settings”.</p>
       </section>
 

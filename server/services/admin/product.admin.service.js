@@ -13,7 +13,8 @@ const { isValidId } = require("../category.service");
 
 const PAGE_SIZE = 20;
 const LOW_STOCK = 5;
-const IMAGE_URL = /^(\/uploads\/[A-Za-z0-9/_.-]+|https:\/\/[^\s"'<>]+)$/;
+// An https:// link, or a picture on this site (/uploads/..., /images/...).
+const IMAGE_URL = /^(\/[A-Za-z0-9/_.-]+|https:\/\/[^\s"'<>]+)$/;
 
 function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -94,9 +95,10 @@ async function readProductInput(data, { creating, current }) {
     if (!Array.isArray(data.images) || data.images.length > 8) throw new ApiError(400, "Up to 8 images are allowed");
     for (const url of data.images) {
       if (typeof url !== "string" || url.length > 500 || !IMAGE_URL.test(url)) {
-        throw new ApiError(400, "Images must be uploaded files or https:// links");
+        throw new ApiError(400, "Image links must start with https://");
       }
     }
+    if (new Set(data.images).size !== data.images.length) throw new ApiError(400, "The same image is added twice");
     input.images = data.images;
   }
 

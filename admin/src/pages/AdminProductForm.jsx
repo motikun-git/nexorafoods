@@ -8,6 +8,17 @@ import { apiRequest, uploadImage } from '../lib/api.js'
 import { flattenCategories } from '../lib/categoryOptions.js'
 import { storeUrl } from '../lib/storeUrl.js'
 
+const MAX_IMAGES = 8
+// Uploading product photos is turned off for now: photos are added as links
+// instead. Set to true to show the upload box again.
+const SHOW_IMAGE_UPLOAD = false
+// Same rule as the server: a full https:// address, or a path on this site.
+const IMAGE_LINK = /^(https:\/\/[^\s"'<>]+|\/[A-Za-z0-9/_.-]+)$/
+
+// Every image row gets its own id, so typing in a link never mixes up rows.
+let nextImageRowId = 0
+const toImageRows = (urls = []) => urls.map((url) => ({ url, rowId: ++nextImageRowId }))
+
 const EMPTY = {
   name: '',
   category: '',
@@ -36,7 +47,7 @@ function toForm(p) {
     stock: String(p.stock ?? 0),
     isPublished: p.isPublished,
     isFeatured: p.isFeatured,
-    images: p.images || [],
+    images: toImageRows(p.images),
   }
 }
 
@@ -52,6 +63,8 @@ function validate(f) {
   }
   if (f.costPrice !== '' && !(Number(f.costPrice) >= 0)) e.costPrice = 'Enter 0 or more (or leave empty).'
   if (!/^\d+$/.test(String(f.stock))) e.stock = 'Enter a whole number (0 or more).'
+  const badLink = f.images.findIndex((row) => row.url.trim() && !IMAGE_LINK.test(row.url.trim()))
+  if (badLink !== -1) e.images = `Image link ${badLink + 1} must start with https://`
   return e
 }
 
@@ -82,14 +95,14 @@ export default function AdminProductForm() {
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
 
   async function onUpload(event) {
-    const files = [...event.target.files].slice(0, 8 - form.images.length)
+    const files = [...event.target.files].slice(0, MAX_IMAGES - form.images.length)
     event.target.value = ''
     if (!files.length) return
     setUploading(true)
     try {
       for (const file of files) {
         const url = await uploadImage(file)
-        setForm((f) => ({ ...f, images: [...f.images, url] }))
+        setForm((f) => ({ ...f, images: [...f.images, { url, rowId: ++nextImageRowId }] }))
       }
     } catch (err) {
       notify(err.message, 'error')
@@ -97,6 +110,13 @@ export default function AdminProductForm() {
       setUploading(false)
     }
   }
+
+  const addImageLink = () => setForm((f) => ({ ...f, images: [...f.images, { url: '', rowId: ++nextImageRowId }] }))
+  const updateImageLink = (rowId, url) => {
+    setForm((f) => ({ ...f, images: f.images.map((row) => (row.rowId === rowId ? { ...row, url } : row)) }))
+    setErrors((e) => ({ ...e, images: undefined })) // checked again on save
+  }
+  const removeImage = (rowId) => setForm((f) => ({ ...f, images: f.images.filter((row) => row.rowId !== rowId) }))
 
   function moveImage(index, direction) {
     setForm((f) => {
@@ -123,6 +143,8 @@ export default function AdminProductForm() {
       discountPrice: form.discountPrice === '' ? null : Number(form.discountPrice),
       costPrice: form.costPrice === '' ? null : Number(form.costPrice),
       stock: Number(form.stock),
+      // Empty link boxes are skipped.
+      images: form.images.map((row) => row.url.trim()).filter(Boolean),
     }
     try {
       const body = await apiRequest(creating ? '/admin/products' : `/admin/products/${id}`, {
@@ -217,44 +239,92 @@ export default function AdminProductForm() {
 
           <section className={card}>
             <h2 className="font-bold">Images</h2>
-            <p className="mt-1 text-sm text-muted">JPEG, PNG or WEBP, up to 2 MB each, max 8. The first image is the main photo.</p>
-            <ul className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {form.images.map((src, i) => (
-                <li key={src} className="relative overflow-hidden rounded-xl border border-line">
-                  <img src={src} alt={`Product image ${i + 1}`} className="aspect-square w-full object-cover" />
-                  {i === 0 ? <span className="absolute left-1 top-1 rounded-full bg-primary px-2 text-[10px] font-bold text-white">Main</span> : null}
-                  <span className="absolute inset-x-1 bottom-1 flex justify-between gap-1">
-                    <button type="button" onClick={() => moveImage(i, -1)} disabled={i === 0} className="grid size-8 place-items-center rounded-full bg-white/90 text-sm disabled:opacity-30" aria-label="Move image left">
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, images: f.images.filter((x) => x !== src) }))}
-                      className="grid size-8 place-items-center rounded-full bg-white/90 text-sm text-red-600"
-                      aria-label="Remove image"
-                    >
-                      ×
-                    </button>
-                    <button type="button" onClick={() => moveImage(i, 1)} disabled={i === form.images.length - 1} className="grid size-8 place-items-center rounded-full bg-white/90 text-sm disabled:opacity-30" aria-label="Move image right">
-                      ›
-                    </button>
-                  </span>
-                </li>
-              ))}
-              {form.images.length < 8 ? (
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => fileInput.current?.click()}
-                    disabled={uploading}
-                    className="grid aspect-square w-full place-items-center rounded-xl border-2 border-dashed border-line text-sm font-semibold text-primary hover:border-primary"
-                  >
-                    {uploading ? 'Uploading…' : '+ Add image'}
-                  </button>
-                  <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onUpload} />
-                </li>
+            <p className="mt-1 text-sm text-muted">
+              Paste image links (addresses starting with https://), up to {MAX_IMAGES}. The first image is the main photo.
+            </p>
+            {errors.images ? <p className="mt-2 text-sm text-red-600">{errors.images}</p> : null}
+            <ul className="mt-4 space-y-3">
+              {form.images.map((row, i) => {
+                const link = row.url.trim()
+                const linkIsValid = IMAGE_LINK.test(link)
+                return (
+                  <li key={row.rowId} className="flex gap-3 rounded-xl border border-line p-2.5">
+                    <div className="relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-cream text-center text-[10px] leading-tight text-muted sm:size-24">
+                      {linkIsValid ? (
+                        // Shown only if the picture cannot be loaded (the image covers it otherwise).
+                        <span className="absolute inset-0 grid place-items-center px-1">Cannot load image</span>
+                      ) : (
+                        <span className="px-1">{link ? 'Must start with https://' : 'Preview'}</span>
+                      )}
+                      {linkIsValid ? (
+                        <img
+                          src={link}
+                          alt={`Product image ${i + 1}`}
+                          className="relative size-full object-cover"
+                          onError={(e) => (e.currentTarget.style.display = 'none')}
+                          onLoad={(e) => (e.currentTarget.style.display = '')}
+                        />
+                      ) : null}
+                      {i === 0 ? <span className="absolute left-1 top-1 rounded-full bg-primary px-2 text-[10px] font-bold text-white">Main</span> : null}
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <label className="block text-xs font-semibold">
+                        Image link {i + 1}
+                        <input
+                          // Plain text box (not type="url"): links to this site's own
+                          // images, like /images/..., are allowed too; checked on save.
+                          type="text"
+                          inputMode="url"
+                          autoComplete="off"
+                          spellCheck={false}
+                          value={row.url}
+                          maxLength={500}
+                          onChange={(e) => updateImageLink(row.rowId, e.target.value)}
+                          placeholder="https://example.com/photo.jpg"
+                          aria-invalid={link && !linkIsValid ? true : undefined}
+                          className={`mt-1 h-11 w-full rounded-xl border bg-white px-3 text-base sm:text-sm ${link && !linkIsValid ? 'border-red-500' : 'border-line'}`}
+                        />
+                      </label>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => moveImage(i, -1)} disabled={i === 0} className="btn-outline min-h-9 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} earlier`}>
+                          ←
+                        </button>
+                        <button type="button" onClick={() => moveImage(i, 1)} disabled={i === form.images.length - 1} className="btn-outline min-h-9 flex-1 px-2 disabled:opacity-30" aria-label={`Move image ${i + 1} later`}>
+                          →
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(row.rowId)}
+                          className="min-h-9 flex-1 rounded-full border border-red-200 px-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                          aria-label={`Remove image ${i + 1}`}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                )
+              })}
+              {form.images.length === 0 ? (
+                <li className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">No images yet.</li>
               ) : null}
             </ul>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {form.images.length < MAX_IMAGES ? (
+                <button type="button" onClick={addImageLink} className="btn-outline">
+                  + Add image link
+                </button>
+              ) : null}
+              {/* Upload option: kept for later, hidden for now (see SHOW_IMAGE_UPLOAD). */}
+              {SHOW_IMAGE_UPLOAD && form.images.length < MAX_IMAGES ? (
+                <>
+                  <button type="button" onClick={() => fileInput.current?.click()} disabled={uploading} className="btn-outline">
+                    {uploading ? 'Uploading…' : '+ Upload image'}
+                  </button>
+                  <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={onUpload} />
+                </>
+              ) : null}
+            </div>
           </section>
         </div>
 

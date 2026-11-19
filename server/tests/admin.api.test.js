@@ -134,12 +134,20 @@ describe("Admin API", () => {
     assert.equal(edited.body.data.stock, 3);
     assert.equal(edited.body.data.isPublished, false);
 
+    // Images are links: https:// addresses or pictures on this site.
+    const imageLinks = ["https://images.example.com/milk.jpg", "/images/products/milk.webp", "/uploads/products/abc.webp"];
+    const withImages = await admin.request("PATCH", `/admin/products/${id}`, { images: imageLinks });
+    assert.equal(withImages.status, 200);
+    assert.deepEqual(withImages.body.data.images, imageLinks);
+
     for (const bad of [
       { discountPrice: 150 }, // more than the price
       { price: -1 },
       { stock: 1.5 },
       { category: "not-an-id" },
       { images: ["javascript:alert(1)"] },
+      { images: ["http://not-secure.example/a.jpg"] },
+      { images: ["/images/a.webp", "/images/a.webp"] }, // the same image twice
       { name: "" },
     ]) {
       assert.equal((await admin.request("PATCH", `/admin/products/${id}`, bad)).status, 400, JSON.stringify(bad));
@@ -248,11 +256,16 @@ describe("Admin API", () => {
     const publicSettings = await createClient().request("GET", "/settings");
     assert.equal(publicSettings.body.data.hero.slides.length, 2);
 
-    const tooMany = Array.from({ length: 9 }, (_, i) => ({ image: `/uploads/products/${i}.webp`, alt: "" }));
-    for (const bad of [[], tooMany, [{ image: "javascript:alert(1)" }], [{ image: "" }], [slides[0], slides[0]], "not a list"]) {
+    const tooMany = Array.from({ length: 21 }, (_, i) => ({ image: `/uploads/products/${i}.webp`, alt: "" }));
+    for (const bad of [tooMany, [{ image: "javascript:alert(1)" }], [{ image: "http://plain-http.example/a.jpg" }], [{ image: "" }], [slides[0], slides[0]], "not a list"]) {
       const res = await admin.request("PATCH", "/admin/settings", { hero: { slides: bad } });
       assert.equal(res.status, 400, JSON.stringify(bad).slice(0, 80));
     }
+
+    // All images can be removed: the homepage then shows no slideshow.
+    const cleared = await admin.request("PATCH", "/admin/settings", { hero: { slides: [] } });
+    assert.equal(cleared.status, 200);
+    assert.deepEqual(cleared.body.data.hero.slides, []);
   });
 
   it("accepts real images only for upload", async () => {

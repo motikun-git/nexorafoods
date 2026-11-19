@@ -67,11 +67,7 @@ module.exports = {
     subtitle: "Discover food, snacks, beverages and everyday essentials at great prices.",
     ctaLabel: "Explore Products",
     ctaLink: "/shop",
-    slides: [
-      { image: "/images/hero/hero-basket.webp", imageSmall: "/images/hero/hero-basket-sm.webp", alt: "A basket of fresh fruits and vegetables" },
-      { image: "/images/hero/hero-grains.webp", imageSmall: "/images/hero/hero-grains-sm.webp", alt: "Bowls of rice, dal, beans and grains" },
-      { image: "/images/hero/hero-dairy.webp", imageSmall: "/images/hero/hero-dairy-sm.webp", alt: "Milk, eggs and cheese" },
-      { image: "/images/hero/hero-bakery.webp", imageSmall: "/images/hero/hero-bakery-sm.webp", alt: "Fresh bread and pastries" },
-    ],
+    // Slideshow images: links added in Admin -> Settings (none by default).
+    slides: [],
   },
 };

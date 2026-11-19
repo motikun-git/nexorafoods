@@ -30,12 +30,11 @@ function money(value, label, { nullable = false } = {}) {
   return Math.round(number);
 }
 
-// Homepage slideshow: 1 to 8 images, each with a short description (alt text)
-// for screen readers and search engines.
-const MAX_SLIDES = 8;
+// Homepage slideshow: 0 to 20 image links, each with a short description
+// (alt text) for screen readers and search engines.
+const MAX_SLIDES = 20;
 function heroSlides(value) {
   if (!Array.isArray(value)) throw new ApiError(400, "Hero images must be a list");
-  if (value.length === 0) throw new ApiError(400, "Keep at least one hero image");
   if (value.length > MAX_SLIDES) throw new ApiError(400, `At most ${MAX_SLIDES} hero images`);
   const seen = new Set();
   return value.map((slide, i) => {

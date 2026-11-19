@@ -18,6 +18,7 @@ const PRODUCT_SLIDE = 'w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-2rem)/3)] md:
 
 export default function HomePage() {
   const { hero = {} } = useSettings()
+  const heroSlides = hero.slides || []
   const { data, error, loading, reload } = useApi('/home')
   const featured = data?.data.featured || []
 
@@ -25,15 +26,21 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section aria-labelledby="hero-title" className="bg-gradient-to-b from-primary-soft to-cream">
-        <div className="container-page grid items-center gap-8 py-8 sm:py-12 lg:grid-cols-2 lg:gap-12 lg:py-16">
+        {/* Desktop: the text column is a little wider than the image column. */}
+        <div
+          className={`container-page grid items-center gap-8 py-8 sm:py-12 lg:gap-12 lg:py-16 ${
+            heroSlides.length ? 'lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : ''
+          }`}
+        >
           <div>
             {hero.badge ? (
               <p className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-accent-dark shadow-card">
                 {hero.badge}
               </p>
             ) : null}
-            <h1 id="hero-title" className="mt-4 text-[2rem] font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-              {hero.title} <span className="block text-primary">{hero.highlight}</span>
+            {/* First line in the brand green, second line in the orange of "Food" in the logo. */}
+            <h1 id="hero-title" className="mt-4 text-[2rem] font-extrabold leading-[1.1] tracking-tight text-primary sm:text-5xl lg:text-6xl">
+              {hero.title} <span className="block text-accent">{hero.highlight}</span>
             </h1>
             {hero.subtitle ? <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">{hero.subtitle}</p> : null}
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
@@ -46,7 +53,7 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <HeroSlider slides={hero.slides} />
+          <HeroSlider slides={heroSlides} />
         </div>
       </section>
 
