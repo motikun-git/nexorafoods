@@ -26,10 +26,11 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section aria-labelledby="hero-title" className="bg-gradient-to-b from-primary-soft to-cream">
-        {/* Desktop: the text column is clearly wider than the image column. */}
+        {/* Desktop: the hero keeps the normal page width. The image column takes all the room
+            the text does not need, so the image sits close to the text. */}
         <div
-          className={`container-page grid items-center gap-8 pb-6 pt-8 sm:pb-8 sm:pt-12 lg:gap-10 lg:pb-10 lg:pt-14 ${
-            heroSlides.length ? 'lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]' : ''
+          className={`container-page grid items-center gap-8 pb-6 pt-8 sm:pb-8 sm:pt-12 lg:gap-6 lg:pb-10 lg:pt-14 ${
+            heroSlides.length ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[auto_minmax(0,1fr)]' : ''
           }`}
         >
           <div>
