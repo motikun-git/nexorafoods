@@ -26,10 +26,10 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section aria-labelledby="hero-title" className="bg-gradient-to-b from-primary-soft to-cream">
-        {/* Desktop: the text column is a little wider than the image column. */}
+        {/* Desktop: the text column is clearly wider than the image column. */}
         <div
-          className={`container-page grid items-center gap-8 py-8 sm:py-12 lg:gap-12 lg:py-16 ${
-            heroSlides.length ? 'lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : ''
+          className={`container-page grid items-center gap-8 pb-6 pt-8 sm:pb-8 sm:pt-12 lg:gap-10 lg:pb-10 lg:pt-14 ${
+            heroSlides.length ? 'lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]' : ''
           }`}
         >
           <div>
@@ -42,7 +42,7 @@ export default function HomePage() {
             <h1 id="hero-title" className="mt-4 text-[2rem] font-extrabold leading-[1.1] tracking-tight text-primary sm:text-5xl lg:text-6xl">
               {hero.title} <span className="block text-accent">{hero.highlight}</span>
             </h1>
-            {hero.subtitle ? <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">{hero.subtitle}</p> : null}
+            {hero.subtitle ? <p className="mt-4 max-w-xl text-base text-muted sm:text-lg">{hero.subtitle}</p> : null}
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
               <Link href={hero.ctaLink || '/shop'} className="btn-primary h-12 px-5 sm:px-6 sm:text-base">
                 {hero.ctaLabel || 'Shop now'}

@@ -242,6 +242,11 @@ export default function AdminProductForm() {
             <p className="mt-1 text-sm text-muted">
               Paste image links (addresses starting with https://), up to {MAX_IMAGES}. The first image is the main photo.
             </p>
+            <p className="mt-2 rounded-xl bg-primary-soft px-3 py-2 text-sm">
+              <span className="font-semibold">Recommended size: 1000 × 1000 pixels</span> (square, 1:1 shape). Product photos are always shown
+              square, so a square picture is shown whole, with nothing cut off. Use at least 800 × 800 so it stays sharp; smaller pictures
+              look blurry or pixelated. Keep the product in the middle with a little space around it.
+            </p>
             {errors.images ? <p className="mt-2 text-sm text-red-600">{errors.images}</p> : null}
             <ul className="mt-4 space-y-3">
               {form.images.map((row, i) => {

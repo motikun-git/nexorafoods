@@ -16,13 +16,14 @@ export default function CategoryStrip() {
   if (loading || tree.length === 0) return null
 
   return (
-    <section aria-labelledby="home-categories" className="container-page mt-12 sm:mt-16">
+    <section aria-labelledby="home-categories" className="container-page mt-6 sm:mt-8">
       <SectionHeading id="home-categories" title="Shop by category" subtitle="Find what you need, faster." linkTo="/shop" linkLabel="See all" />
+      {/* Phone: 3 categories visible, tablet: 4, larger screens: 5. */}
       <AutoCarousel
         label="Product categories"
         items={[...tree, SEE_MORE]}
         getKey={(item) => item._id}
-        itemClassName="w-[calc((100%-1.5rem)/3)] sm:w-[calc((100%-3rem)/4)] md:w-[calc((100%-4rem)/5)] lg:w-[calc((100%-6rem)/7)]"
+        itemClassName="w-[calc((100%-1.5rem)/3)] sm:w-[calc((100%-3rem)/4)] md:w-[calc((100%-4rem)/5)]"
         renderItem={(category) =>
           category.seeMore ? (
             <SeeMoreCard to="/shop" title="See more" />

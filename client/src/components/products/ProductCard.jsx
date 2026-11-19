@@ -16,7 +16,7 @@ export default function ProductCard({ product }) {
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-card">
       <Link
         href={href}
-        className="relative block aspect-[5/4] overflow-hidden bg-primary-soft sm:aspect-square"
+        className="relative block aspect-square overflow-hidden bg-primary-soft"
         tabIndex={-1}
         aria-hidden="true"
       >

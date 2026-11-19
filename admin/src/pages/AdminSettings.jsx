@@ -199,8 +199,13 @@ export default function AdminSettings() {
       <section className="mt-5 rounded-2xl border border-line bg-white p-4 sm:p-5">
         <h2 className="font-bold">Homepage slideshow images</h2>
         <p className="mt-1 text-sm text-muted">
-          Paste image links (addresses starting with https://). They change every 3 seconds, in this order. Wide photos look best
-          (about 4:3). Leave the list empty to show no slideshow.
+          Paste image links (addresses starting with https://). They change every 3 seconds, in this order. Leave the list empty to show
+          no slideshow.
+        </p>
+        <p className="mt-2 rounded-xl bg-primary-soft px-3 py-2 text-sm">
+          <span className="font-semibold">Recommended size: 1600 × 1200 pixels</span> (landscape, 4:3 shape). The slideshow is always 4:3,
+          so a picture of exactly this shape is shown whole, with nothing cut off. Use at least 1200 × 900 so it stays sharp; smaller
+          pictures look blurry or pixelated.
         </p>
         <ul className="mt-3 space-y-3">
           {slides.map((slide, i) => {

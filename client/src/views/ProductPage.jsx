@@ -108,7 +108,7 @@ function ProductDetails({ product, breadcrumb, related }) {
       <div className="mt-6 grid gap-8 md:grid-cols-2 lg:gap-12">
         {/* Images */}
         <div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-line bg-primary-soft md:aspect-square">
+          <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-primary-soft">
             {images.length ? (
               <img src={images[activeImage]} alt={product.name} className="size-full object-cover" />
             ) : (

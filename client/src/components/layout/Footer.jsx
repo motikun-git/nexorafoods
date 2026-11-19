@@ -8,6 +8,7 @@ import Icon from '../ui/Icon.jsx'
 import Logo from '../ui/Logo.jsx'
 import { categoryLink } from './CategoryMenu.jsx'
 import { NAV_LINKS } from './navLinks.js'
+import { PaymentBadges } from '../payment/PaymentMethods.jsx'
 
 const SOCIAL_LABELS = { facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube' }
 
@@ -118,9 +119,15 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <p className="container-page py-5 text-center text-xs text-white/60">
-          © {year} {storeName}. All rights reserved.
-        </p>
+        <div className="container-page flex flex-col items-center gap-3 py-5 sm:flex-row sm:justify-between">
+          <p className="text-center text-xs text-white/60">
+            © {year} {storeName}. All rights reserved.
+          </p>
+          <div className="flex flex-col items-center gap-2 sm:flex-row">
+            <span className="text-xs text-white/60">Payment options</span>
+            <PaymentBadges className="justify-center" badgeClassName="bg-white/10 text-white" />
+          </div>
+        </div>
       </div>
     </footer>
   )

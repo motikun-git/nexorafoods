@@ -68,7 +68,7 @@ export default function HeroSlider({ slides = [] }) {
       }}
     >
       <div
-        className="relative aspect-[4/3] touch-pan-y select-none sm:aspect-[16/10] lg:aspect-[4/3]"
+        className="relative aspect-[4/3] touch-pan-y select-none"
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={() => (swipeStart.current = null)}

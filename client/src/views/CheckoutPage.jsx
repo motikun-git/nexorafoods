@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { ONLINE_PAYMENT_METHODS } from '../components/payment/PaymentMethods.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
@@ -195,7 +196,19 @@ export default function CheckoutPage() {
             ) : (
               <p className="mt-3 text-sm text-red-600">No payment method is available right now.</p>
             )}
-            <p className="mt-3 text-xs text-muted">Online payment (bKash, Nagad, card) is coming soon.</p>
+            {/* Online methods are shown but not selectable yet (see PaymentMethods.jsx). */}
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {ONLINE_PAYMENT_METHODS.map((method) => (
+                <li key={method.id} aria-disabled="true" className="flex min-h-14 items-center gap-3 rounded-xl border border-line bg-cream/60 px-4 text-muted">
+                  <input type="radio" name="payment" disabled className="size-5" aria-label={`${method.name} (coming soon)`} />
+                  <span className="flex-1">
+                    <span className="block font-semibold text-ink/70">{method.name}</span>
+                    <span className="block text-xs">{method.kind}</span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-bold text-accent-dark">Coming soon</span>
+                </li>
+              ))}
+            </ul>
           </section>
         </div>
 
