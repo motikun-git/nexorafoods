@@ -19,7 +19,7 @@ logs/
 *.log
 npm-debug.log*
 
-# ===== Uploaded files (stored in cloud later) =====
+# ===== Uploaded files (saved on the server, not in Git) =====
 server/uploads/
 
 # ===== Editor / OS =====

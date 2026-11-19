@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useCart } from '../../context/CartContext.jsx'
-import { useSettings } from '../../context/SettingsContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { apiRequest } from '../../lib/api.js'
-import { formatPrice } from '../../lib/format.js'
-import { AREA_LABEL, ORDER_STATUS, StatusBadge, formatDate } from '../../lib/orders.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useNotify } from '../context/NotifyContext.jsx'
+import { useSettings } from '../context/SettingsContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { apiRequest } from '../lib/api.js'
+import { formatPrice } from '../lib/format.js'
+import { AREA_LABEL, ORDER_STATUS, StatusBadge, formatDate } from '../lib/orders.jsx'
 
 // Button text for each possible next status.
 const ACTION_LABEL = {
@@ -21,7 +21,7 @@ export default function AdminOrderDetail() {
   const { orderNumber } = useParams()
   const { data, error, loading } = useApi(`/admin/orders/${encodeURIComponent(orderNumber)}`)
   const { currency } = useSettings()
-  const { notify } = useCart()
+  const { notify } = useNotify()
   const [order, setOrder] = useState(null)
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(null)

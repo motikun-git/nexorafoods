@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import Icon from '../../components/ui/Icon.jsx'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useCart } from '../../context/CartContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { apiRequest } from '../../lib/api.js'
-import { flattenCategories } from '../../lib/categoryOptions.js'
+import Icon from '../components/ui/Icon.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useNotify } from '../context/NotifyContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { apiRequest } from '../lib/api.js'
+import { flattenCategories } from '../lib/categoryOptions.js'
 
 // All ids inside a branch (the category itself + every descendant).
 function branchIds(node) {
@@ -26,7 +26,7 @@ function filterTree(nodes, term) {
  */
 export default function AdminCategories() {
   const { data, error, loading, reload } = useApi('/admin/categories')
-  const { notify } = useCart()
+  const { notify } = useNotify()
   const [search, setSearch] = useState('')
   const [dialog, setDialog] = useState(null) // { type, node }
   const [busy, setBusy] = useState(false)

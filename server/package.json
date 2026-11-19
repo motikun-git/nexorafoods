@@ -10,7 +10,9 @@
     "seed:categories": "node scripts/seed-categories.js",
     "seed:demo": "node scripts/seed-demo.js",
     "seed:demo:remove": "node scripts/seed-demo.js --remove",
-    "make-admin": "node scripts/make-admin.js"
+    "make-admin": "node scripts/make-admin.js",
+    "reset-password": "node scripts/reset-password.js",
+    "set-product-images": "node scripts/set-product-images.js"
   },
   "keywords": [],
   "author": "",

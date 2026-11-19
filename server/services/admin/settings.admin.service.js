@@ -30,6 +30,27 @@ function money(value, label, { nullable = false } = {}) {
   return Math.round(number);
 }
 
+// Homepage slideshow: 1 to 8 images, each with a short description (alt text)
+// for screen readers and search engines.
+const MAX_SLIDES = 8;
+function heroSlides(value) {
+  if (!Array.isArray(value)) throw new ApiError(400, "Hero images must be a list");
+  if (value.length === 0) throw new ApiError(400, "Keep at least one hero image");
+  if (value.length > MAX_SLIDES) throw new ApiError(400, `At most ${MAX_SLIDES} hero images`);
+  const seen = new Set();
+  return value.map((slide, i) => {
+    if (!slide || typeof slide !== "object") throw new ApiError(400, "Invalid hero image");
+    const image = link(slide.image ?? "", `Hero image ${i + 1}`);
+    if (!image) throw new ApiError(400, `Hero image ${i + 1} is missing`);
+    if (seen.has(image)) throw new ApiError(400, "The same hero image is added twice");
+    seen.add(image);
+    const result = { image, alt: text(slide.alt ?? "", `Hero image ${i + 1} description`, 120) };
+    const small = slide.imageSmall ? link(slide.imageSmall, `Hero image ${i + 1} (small)`) : "";
+    if (small) result.imageSmall = small;
+    return result;
+  });
+}
+
 // Each entry: [path, validator]
 const FIELDS = [
   ["storeName", (v) => text(v, "Store name", 60, { required: true })],
@@ -80,6 +101,7 @@ const FIELDS = [
   ["hero.highlight", (v) => text(v, "Hero highlight", 80)],
   ["hero.subtitle", (v) => text(v, "Hero subtitle", 200)],
   ["hero.ctaLabel", (v) => text(v, "Button text", 30)],
+  ["hero.slides", heroSlides],
 ];
 
 function getPath(object, path) {

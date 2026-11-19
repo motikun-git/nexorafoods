@@ -6,7 +6,7 @@ const AUTH_COOKIE = "auth_token";
 
 const authCookieOptions = {
   httpOnly: true,
-  sameSite: env.isProduction ? "none" : "lax",
+  sameSite: "lax", // site and API share one address
   secure: env.isProduction,
   maxAge: 1000 * 60 * 60 * 24 * TOKEN_DAYS,
   path: "/",

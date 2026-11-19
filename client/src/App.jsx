@@ -1,21 +1,11 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import RequireAdmin from './components/auth/RequireAdmin.jsx'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { CartProvider, useCart } from './context/CartContext.jsx'
 import { CategoriesProvider } from './context/CategoriesContext.jsx'
 import { SettingsProvider } from './context/SettingsContext.jsx'
-import AdminLayout from './layouts/AdminLayout.jsx'
 import SiteLayout from './layouts/SiteLayout.jsx'
-import AdminCategories from './pages/admin/AdminCategories.jsx'
-import AdminDashboard from './pages/admin/AdminDashboard.jsx'
-import AdminMessages from './pages/admin/AdminMessages.jsx'
-import AdminOrderDetail from './pages/admin/AdminOrderDetail.jsx'
-import AdminOrders from './pages/admin/AdminOrders.jsx'
-import AdminProductForm from './pages/admin/AdminProductForm.jsx'
-import AdminProducts from './pages/admin/AdminProducts.jsx'
-import AdminSettings from './pages/admin/AdminSettings.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import AccountPage from './pages/AccountPage.jsx'
 import CheckoutPage from './pages/CheckoutPage.jsx'
@@ -27,6 +17,16 @@ import OrderPage from './pages/OrderPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import ShopPage from './pages/ShopPage.jsx'
+import { ADMIN_URL } from './lib/adminUrl.js'
+
+// The admin panel is a separate app. In production the server sends /admin
+// to it directly; this only matters in development (store on port 5173).
+function AdminRedirect() {
+  useEffect(() => {
+    window.location.replace(ADMIN_URL)
+  }, [])
+  return null
+}
 
 // Old /cart links open the cart drawer on the shop page.
 function CartRoute() {
@@ -78,27 +78,7 @@ export default function App() {
                   <Route path="contact" element={<ContactPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
-
-                {/* Admin area: its own layout, admins only */}
-                <Route
-                  path="admin"
-                  element={
-                    <RequireAdmin>
-                      <AdminLayout />
-                    </RequireAdmin>
-                  }
-                >
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="orders" element={<AdminOrders />} />
-                  <Route path="orders/:orderNumber" element={<AdminOrderDetail />} />
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="products/new" element={<AdminProductForm />} />
-                  <Route path="products/:id" element={<AdminProductForm key="edit" />} />
-                  <Route path="categories" element={<AdminCategories />} />
-                  <Route path="settings" element={<AdminSettings />} />
-                  <Route path="messages" element={<AdminMessages />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Route>
+                <Route path="admin/*" element={<AdminRedirect />} />
               </Routes>
             </CartProvider>
           </CategoriesProvider>

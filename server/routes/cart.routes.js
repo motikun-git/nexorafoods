@@ -10,7 +10,7 @@ const CART_COOKIE = "cart_token";
 // requires SameSite=None + Secure (HTTPS).
 const cartCookieOptions = {
   httpOnly: true,
-  sameSite: env.isProduction ? "none" : "lax",
+  sameSite: "lax", // site and API share one address
   secure: env.isProduction,
   maxAge: 1000 * 60 * 60 * 24 * 60, // 60 days
   path: "/",

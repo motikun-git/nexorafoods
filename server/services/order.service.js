@@ -214,7 +214,7 @@ async function cancelMyOrder(user, orderNumber) {
         $set: { status: "cancelled" },
         $push: { statusHistory: { status: "cancelled", at: new Date(), note: "Cancelled by customer" } },
       },
-      { new: true, session }
+      { returnDocument: "after", session }
     );
     if (!updated) throw new ApiError(409, "This order can no longer be cancelled. Please contact us.");
 

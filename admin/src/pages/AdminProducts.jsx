@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import Pagination from '../../components/shop/Pagination.jsx'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useCart } from '../../context/CartContext.jsx'
-import { useSettings } from '../../context/SettingsContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { apiRequest } from '../../lib/api.js'
-import { flattenCategories } from '../../lib/categoryOptions.js'
-import { formatPrice } from '../../lib/format.js'
+import Pagination from '../components/ui/Pagination.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useNotify } from '../context/NotifyContext.jsx'
+import { useSettings } from '../context/SettingsContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { apiRequest } from '../lib/api.js'
+import { flattenCategories } from '../lib/categoryOptions.js'
+import { formatPrice } from '../lib/format.js'
 
 const FILTER_KEYS = ['search', 'category', 'status', 'stock', 'featured', 'sort', 'page']
 
 export default function AdminProducts() {
   const [params, setParams] = useSearchParams()
   const { currency } = useSettings()
-  const { notify } = useCart()
+  const { notify } = useNotify()
   const [search, setSearch] = useState(params.get('search') || '')
   const [changed, setChanged] = useState({}) // id -> updated product (quick edits)
   useEffect(() => setSearch(params.get('search') || ''), [params])

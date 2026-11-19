@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import Pagination from '../../components/shop/Pagination.jsx'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useSettings } from '../../context/SettingsContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { formatPrice } from '../../lib/format.js'
-import { ORDER_STATUS, StatusBadge, formatDate } from '../../lib/orders.jsx'
+import Pagination from '../components/ui/Pagination.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useSettings } from '../context/SettingsContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { formatPrice } from '../lib/format.js'
+import { ORDER_STATUS, StatusBadge, formatDate } from '../lib/orders.jsx'
 
 const TABS = ['', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 

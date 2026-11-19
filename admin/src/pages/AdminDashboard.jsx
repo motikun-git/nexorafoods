@@ -1,9 +1,9 @@
 import { Link } from 'react-router'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useSettings } from '../../context/SettingsContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { formatPrice } from '../../lib/format.js'
-import { StatusBadge, formatDate } from '../../lib/orders.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useSettings } from '../context/SettingsContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { formatPrice } from '../lib/format.js'
+import { StatusBadge, formatDate } from '../lib/orders.jsx'
 
 function Stat({ label, value, hint, to, tone = 'text-ink' }) {
   const body = (

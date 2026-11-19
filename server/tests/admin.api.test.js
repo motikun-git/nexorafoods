@@ -235,6 +235,26 @@ describe("Admin API", () => {
     }
   });
 
+  it("lets the admin change, reorder and remove hero slideshow images", async () => {
+    const slides = [
+      { image: "/uploads/products/b.webp", alt: "Second photo" },
+      { image: "https://images.example.com/products/a.jpg", alt: "First photo" },
+    ];
+    const saved = await admin.request("PATCH", "/admin/settings", { hero: { slides } });
+    assert.equal(saved.status, 200);
+    assert.deepEqual(saved.body.data.hero.slides, slides);
+    assert.ok(saved.body.data.hero.title, "other hero texts are kept");
+
+    const publicSettings = await createClient().request("GET", "/settings");
+    assert.equal(publicSettings.body.data.hero.slides.length, 2);
+
+    const tooMany = Array.from({ length: 9 }, (_, i) => ({ image: `/uploads/products/${i}.webp`, alt: "" }));
+    for (const bad of [[], tooMany, [{ image: "javascript:alert(1)" }], [{ image: "" }], [slides[0], slides[0]], "not a list"]) {
+      const res = await admin.request("PATCH", "/admin/settings", { hero: { slides: bad } });
+      assert.equal(res.status, 400, JSON.stringify(bad).slice(0, 80));
+    }
+  });
+
   it("accepts real images only for upload", async () => {
     const png = Buffer.from(
       "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082",

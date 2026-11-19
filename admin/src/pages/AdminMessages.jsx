@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useCart } from '../../context/CartContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { apiRequest } from '../../lib/api.js'
-import { formatDate } from '../../lib/orders.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useNotify } from '../context/NotifyContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { apiRequest } from '../lib/api.js'
+import { formatDate } from '../lib/orders.jsx'
 
 const LABEL = { new: 'New', read: 'Read', replied: 'Replied' }
 
@@ -11,7 +11,7 @@ const LABEL = { new: 'New', read: 'Read', replied: 'Replied' }
 export default function AdminMessages() {
   const [status, setStatus] = useState('')
   const { data, loading, error, reload } = useApi(`/admin/messages${status ? `?status=${status}` : ''}`)
-  const { notify } = useCart()
+  const { notify } = useNotify()
   const messages = data?.data || []
 
   async function mark(message, next) {

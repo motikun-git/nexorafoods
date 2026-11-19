@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
-import FormField from '../../components/ui/FormField.jsx'
-import Spinner from '../../components/ui/Spinner.jsx'
-import { useCart } from '../../context/CartContext.jsx'
-import { useApi } from '../../hooks/useApi.js'
-import { apiRequest, uploadImage } from '../../lib/api.js'
-import { flattenCategories } from '../../lib/categoryOptions.js'
+import FormField from '../components/ui/FormField.jsx'
+import Spinner from '../components/ui/Spinner.jsx'
+import { useNotify } from '../context/NotifyContext.jsx'
+import { useApi } from '../hooks/useApi.js'
+import { apiRequest, uploadImage } from '../lib/api.js'
+import { flattenCategories } from '../lib/categoryOptions.js'
+import { storeUrl } from '../lib/storeUrl.js'
 
 const EMPTY = {
   name: '',
@@ -59,7 +60,7 @@ export default function AdminProductForm() {
   const { id } = useParams()
   const creating = !id
   const navigate = useNavigate()
-  const { notify } = useCart()
+  const { notify } = useNotify()
   const existing = useApi(creating ? null : `/admin/products/${id}`)
   const categories = useApi('/admin/categories')
   const options = useMemo(() => flattenCategories(categories.data?.data.tree || []), [categories.data])
@@ -160,7 +161,7 @@ export default function AdminProductForm() {
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-extrabold tracking-tight">{creating ? 'Add product' : form.name || 'Edit product'}</h1>
         {product?.isPublished ? (
-          <a href={`/product/${product.slug}`} target="_blank" rel="noreferrer" className="text-sm font-semibold text-primary underline">
+          <a href={storeUrl(`/product/${product.slug}`)} target="_blank" rel="noreferrer" className="text-sm font-semibold text-primary underline">
             View in store ↗
           </a>
         ) : null}

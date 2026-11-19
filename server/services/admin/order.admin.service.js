@@ -95,7 +95,7 @@ async function updateStatus(orderNumber, body, admin) {
       $push: { statusHistory: { status: next, at: new Date(), note: note || `Changed by ${admin.name}` } },
     };
     // Only succeeds if nobody changed the status in the meantime.
-    const updated = await Order.findOneAndUpdate({ _id: order._id, status: order.status }, update, { new: true, session });
+    const updated = await Order.findOneAndUpdate({ _id: order._id, status: order.status }, update, { returnDocument: "after", session });
     if (!updated) throw new ApiError(409, "This order was just changed by someone else. Please reload.");
 
     if (next === "cancelled") {

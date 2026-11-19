@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import Drawer from '../components/ui/Drawer.jsx'
 import Icon from '../components/ui/Icon.jsx'
-import Toast from '../components/ui/Toast.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSettings } from '../context/SettingsContext.jsx'
+import { storeUrl } from '../lib/storeUrl.js'
 
 export const ADMIN_LINKS = [
   { to: '/admin', label: 'Dashboard', icon: 'grid', end: true },
@@ -44,7 +44,8 @@ function AdminNav({ onNavigate }) {
 // Frame for every /admin page: side menu (desktop) or drawer (phone).
 export default function AdminLayout() {
   const { storeName, logo } = useSettings()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const { pathname } = useLocation()
@@ -52,6 +53,12 @@ export default function AdminLayout() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [pathname])
+
+  async function onLogout() {
+    setMenuOpen(false)
+    await logout()
+    navigate('/admin/login', { replace: true })
+  }
 
   const brand = (
     <Link to="/admin" className="flex items-center gap-2">
@@ -71,10 +78,14 @@ export default function AdminLayout() {
         </div>
         <div className="border-t border-line p-3 text-sm">
           <p className="truncate px-3 text-muted">{user.name}</p>
-          <Link to="/" className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-3 font-semibold hover:bg-cream">
+          <a href={storeUrl('/')} className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-3 font-semibold hover:bg-cream">
             <Icon name="external" className="size-4" />
             View store
-          </Link>
+          </a>
+          <button type="button" onClick={onLogout} className="flex min-h-11 w-full items-center gap-2 rounded-xl px-3 font-semibold hover:bg-cream">
+            <Icon name="logout" className="size-4" />
+            Log out
+          </button>
         </div>
       </aside>
 
@@ -95,13 +106,16 @@ export default function AdminLayout() {
       <Drawer open={menuOpen} onClose={closeMenu} title="Admin menu">
         <div className="p-3">
           <AdminNav onNavigate={closeMenu} />
-          <Link to="/" onClick={closeMenu} className="mt-4 flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold hover:bg-cream">
+          <a href={storeUrl('/')} onClick={closeMenu} className="mt-4 flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold hover:bg-cream">
             <Icon name="external" className="size-4" />
             View store
-          </Link>
+          </a>
+          <button type="button" onClick={onLogout} className="flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-sm font-semibold hover:bg-cream">
+            <Icon name="logout" className="size-4" />
+            Log out
+          </button>
         </div>
       </Drawer>
-      <Toast />
     </div>
   )
 }
